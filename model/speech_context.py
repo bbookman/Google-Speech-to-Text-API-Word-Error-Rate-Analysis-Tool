@@ -1,4 +1,4 @@
-class SpeechContext():
+class SpeechContext(object):
     phrases = []
     boost = int()
 
@@ -14,3 +14,6 @@ class SpeechContext():
 
     def get_boost(self):
         return self.boost
+
+    def __str__(self):
+        return f'phrases: {self.phrases}, boost: {self.boost}'
