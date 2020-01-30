@@ -20,6 +20,22 @@ def test_set_then_get_phrases():
     context = SpeechContext()
     context.set_phrases(expected)
     result = context.get_phrases()
-    assert expected == result
+    assert result == expected
 
-    
+def test_set_boost():
+    from model.speech_context import SpeechContext
+    context = SpeechContext()
+    context.set_boost(1)
+
+def test_get_boost():
+    from model.speech_context import SpeechContext
+    context = SpeechContext()
+    context.get_boost()
+
+def test_set_then_get_boost():
+    from model.speech_context import SpeechContext
+    expected = 5
+    context = SpeechContext()
+    context.set_boost(expected)
+    result = context.get_boost()
+    assert result == expected
