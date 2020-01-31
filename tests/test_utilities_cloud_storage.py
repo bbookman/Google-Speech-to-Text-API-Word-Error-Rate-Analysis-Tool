@@ -1,6 +1,5 @@
 import pytest
 
-
 def test_get_uri():
     from utilities.cloud_storage import GCS
     gcs = GCS()
@@ -34,7 +33,13 @@ def test_get_file_list():
     assert success
 
 def test_read_ref():
-
+    from utilities.cloud_storage import GCS
+    gcs = GCS()
+    uri = "gs://brb/test_audio_n_truth/"
+    text_file = "test.txt"
+    expected = "hello world"
+    result = gcs.read_ref(uri, text_file)
+    assert result == expected
 
 
 
