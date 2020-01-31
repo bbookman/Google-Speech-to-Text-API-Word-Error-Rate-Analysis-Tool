@@ -71,3 +71,4 @@ def test_string_to_enum_speex_with_header_byte():
     txt = 'SPEEX_WITH_HEADER_BYTE'
     result = u.string_to_enum(txt)
     assert result == expected
+
