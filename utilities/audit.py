@@ -1,0 +1,2 @@
+class FileTools(object):
+    pass
