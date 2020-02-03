@@ -72,3 +72,53 @@ def test_string_to_enum_speex_with_header_byte():
     result = u.string_to_enum(txt)
     assert result == expected
 
+def test_is_valid_file_extension_false():
+    from utilities.utilities import Utilities
+    u = Utilities()
+    expected = False
+    extension = 'doc'
+    result = u.is_valid_file_extension(extension)
+    assert result == expected
+
+
+def test_is_valid_file_extension_true1():
+    from utilities.utilities import Utilities
+    u = Utilities()
+    expected = True
+    extension = 'flac'
+    result = u.is_valid_file_extension(extension)
+    assert result == expected
+
+
+def test_is_valid_file_extension_true2():
+    from utilities.utilities import Utilities
+    u = Utilities()
+    expected = True
+    extension = 'MP3'
+    result = u.is_valid_file_extension(extension)
+    assert result == expected
+
+def test_is_audio_homogeneous_false():
+    from utilities.utilities import Utilities
+    u = Utilities()
+    test_list = ['hello.wav', 'hello.mp3', 'wow.flac', 'wow.wav', 'test.txt']
+    expected = False
+    result = u.is_audio_homogeneous(test_list)
+    assert result == expected
+
+
+def test_is_audio_homogeneous_true1():
+    from utilities.utilities import Utilities
+    u = Utilities()
+    test_list = ['hello.wav', 'wow.wav', 'test.txt']
+    expected = True
+    result = u.is_audio_homogeneous(test_list)
+    assert result == expected
+
+def test_is_audio_homogeneous_true2():
+    from utilities.utilities import Utilities
+    u = Utilities()
+    test_list = ['hello.ogg_opus', 'hello.txt']
+    expected = True
+    result = u.is_audio_homogeneous(test_list)
+    assert result == expected
