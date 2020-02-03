@@ -104,7 +104,7 @@ class Utilities():
         # check that each audio file has a reference text pair
         audio_set = self._get_audio_set(file_list)
         ref_set = self._get_ref_set(file_list)
-        mismatch = audio_set.intersection(ref_set)
+        mismatch = audio_set.difference(ref_set)
         if mismatch:
             return False, f'Audio files exist with no paired reference human transcription text files'
 
