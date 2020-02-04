@@ -123,3 +123,11 @@ def test_remove_stop_words():
     expected = " This way world ends bang whimper"
     results = options.remove_stop_words(data)
     assert results == expected
+
+def test_apply_stemming():
+    from utilities.nlp_options import NLPOptions
+    options = NLPOptions()
+    data = 'the quick brown fox jumped over the lazy dog'
+    expected = 'the quick brown fox jump over the lazi dog '
+    result = options.apply_stemming(data)
+    assert result == expected

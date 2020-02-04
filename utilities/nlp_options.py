@@ -84,3 +84,15 @@ class NLPOptions(object):
         for w in filtered:
             result += " " + w
         return result
+
+    def apply_stemming(self, text):
+        from nltk.stem import PorterStemmer
+        from nltk.tokenize import word_tokenize
+
+        results = ""
+        ps = PorterStemmer()
+        words = word_tokenize(text)
+
+        for w in words:
+            results += (ps.stem(w) + " ")
+        return results
