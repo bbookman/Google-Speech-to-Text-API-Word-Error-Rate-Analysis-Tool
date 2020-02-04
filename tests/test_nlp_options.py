@@ -107,3 +107,11 @@ def test_expand_contractions_isnt():
     data = "isn't"
     result = options.expand_contractions(data)
     assert result == expected
+
+def test_convert_numbers_to_words():
+    from utilities.nlp_options import NLPOptions
+    options = NLPOptions()
+    data = '10'
+    expected = ' ten'
+    result = options.convert_numbers_to_words(data)
+    assert result == expected

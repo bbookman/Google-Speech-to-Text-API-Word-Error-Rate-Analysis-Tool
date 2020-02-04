@@ -55,3 +55,19 @@ class NLPOptions(object):
         expanded_text = contractions_pattern.sub(expand_match, text)
         expanded_text = re.sub("'", "", expanded_text)
         return expanded_text
+
+    def convert_numbers_to_words(self, text):
+        # does not handle things like 21st, 4th
+        from nltk.tokenize import word_tokenize
+        import inflect
+
+        result = ''
+        i = inflect.engine()
+        word_tokens = word_tokenize(text)
+        for w in word_tokens:
+            if w.isdigit():
+                numword = i.number_to_words(w)
+                result += f' {numword}'
+            else:
+                result += f' {w}'
+        return result
