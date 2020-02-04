@@ -71,3 +71,16 @@ class NLPOptions(object):
             else:
                 result += f' {w}'
         return result
+
+    def remove_stop_words(self, text):
+        from nltk.corpus import stopwords
+        import string
+        result = str()
+        stop_words = set(stopwords.words('english'))
+        words = text.split()
+        table = str.maketrans('', '', string.punctuation)
+        stripped = [w.translate(table) for w in words]
+        filtered = [w for w in stripped if not w in stop_words]
+        for w in filtered:
+            result += " " + w
+        return result

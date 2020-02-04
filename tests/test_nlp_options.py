@@ -115,3 +115,11 @@ def test_convert_numbers_to_words():
     expected = ' ten'
     result = options.convert_numbers_to_words(data)
     assert result == expected
+
+def test_remove_stop_words():
+    from utilities.nlp_options import NLPOptions
+    options = NLPOptions()
+    data = "This is the way the world ends, not with a bang but with a whimper"
+    expected = " This way world ends bang whimper"
+    results = options.remove_stop_words(data)
+    assert results == expected
