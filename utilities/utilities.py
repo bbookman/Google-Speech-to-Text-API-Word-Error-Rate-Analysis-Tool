@@ -51,7 +51,7 @@ class Utilities():
             return False
         return True
 
-    def _get_root_filename(self, uri):
+    def get_root_filename(self, uri):
         last_slash = uri.rfind('/')
         if last_slash:
             file_name = uri[last_slash+1:]
@@ -67,20 +67,20 @@ class Utilities():
         for file_name in file_list:
             for ext in self.supported_audio_extensions:
                 if ext in file_name:
-                    result.add(self._get_root_filename(file_name))
+                    result.add(self.get_root_filename(file_name))
         return result
 
     def _get_ref_set(self, file_list):
         result = set()
         for file_name in file_list:
             if '.txt' in file_name:
-                result.add(self._get_root_filename(file_name))
+                result.add(self.get_root_filename(file_name))
         return result
 
     def _is_paired(self, text_file_name, file_list):
         # get audio list
         audio_files = self._get_audio_set(file_list)
-        txt_root = self._get_root_filename(text_file_name)
+        txt_root = self.get_root_filename(text_file_name)
         for audio in audio_files:
             if txt_root in audio:
                 return True

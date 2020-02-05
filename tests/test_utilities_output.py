@@ -100,3 +100,31 @@ def test_update_csv():
     os.remove(full_path)
 
 
+def test_html_diagnostic_contents():
+    from utilities.output import Writer
+    from utilities.utilities import Utilities
+    import os
+    hypothesis = 'this is a hyp'
+    reference = 'this is a ref'
+    html = 'this is a <span style="background-color: greenyellow"><del>hyp</del></span><span style="background-color: yellow">ref </span>'
+    expected = html.split()
+    u = Utilities()
+    writer = Writer()
+    audio_uri = 'gs://foo/bar/baz/test.flac'
+    results_path = 'test_results_path'
+    writer.set_result_path(results_path)
+    expected_file_name = u.get_root_filename(audio_uri) + '.html'
+
+    writer.write_html_diagnostic(hypothesis, reference, audio_uri, results_path)
+    file_path = f'{results_path}/{expected_file_name}'
+    with open(file_path, 'r') as f:
+        reader = f.read()
+        results = reader.split()
+        for result in results:
+            passed = False
+            for item in expected:
+                if result in item:
+                    passed = True
+                    continue
+            assert passed == True
+    os.remove(file_path)

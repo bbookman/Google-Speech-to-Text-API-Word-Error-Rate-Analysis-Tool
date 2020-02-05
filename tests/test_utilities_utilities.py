@@ -135,7 +135,7 @@ def test_get_root_filename_from_uri():
     u = Utilities()
     expected = 'file'
     data = 'gs://foo/bar/baz/file.wav'
-    result = u._get_root_filename(data)
+    result = u.get_root_filename(data)
     assert result == expected
 
 def test_get_root_filename_from_file_name():
@@ -143,7 +143,7 @@ def test_get_root_filename_from_file_name():
     u = Utilities()
     expected = 'file'
     data = 'file.doc'
-    result = u._get_root_filename(data)
+    result = u.get_root_filename(data)
     assert result == expected
 
 def test_get_audio_set():

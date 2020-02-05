@@ -45,3 +45,16 @@ class Writer(object):
                  f'{remove_stop_words}, {convert_numbers_to_words}, {expand_contractions}\n'
         with open(full_path, 'a+',) as file:
             file.write(string)
+
+    def write_html_diagnostic(self, hypothesis, reference, audio_file, result_path):
+        from utilities.utilities import Utilities
+        from utilities.wer import SimpleWER
+        wer_obj = SimpleWER()
+        wer_obj.AddHypRef(hypothesis, reference)
+        aligned_html = '<br>'.join(wer_obj.aligned_htmls)
+        u = Utilities()
+        root = u.get_root_filename(audio_file)
+        result_file = root + '.html'
+        write_path = f'{result_path}/{result_file}'
+        with open(write_path, 'w') as f:
+            f.write(aligned_html)
