@@ -1,6 +1,7 @@
 import argparse
 import os
 from model.speech_context import SpeechContext
+from utilities.utilities import Utilities
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -55,6 +56,8 @@ if __name__ == "__main__":
     boosts = [int(i) for i in args.boosts]
     alts = args.alternative_languages
 
+    phrases = list()
+
     # check phrase file
     if phrase_file_path:
         # validate phrase file exists
@@ -67,6 +70,9 @@ if __name__ == "__main__":
         try:
             with open(phrase_file_path, 'r') as file:
                 contents = file.read()
+                phrases = contents.split()
+                if not phrases:
+                    raise EOFError(f"No data found in {phrase_file_path} ")
         except IOError as e:
             print(f'Could not open phrases file {phrase_file_path}')
             print(e)
@@ -74,4 +80,5 @@ if __name__ == "__main__":
     # if boosts exist, there should be phrases
     if boosts and not phrase_file_path:
         raise FileNotFoundError(f'Boosts {boosts} specified, but no phrase file specified.')
-    
+
+
