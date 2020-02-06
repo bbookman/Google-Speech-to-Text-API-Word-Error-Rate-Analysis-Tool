@@ -88,10 +88,15 @@ if __name__ == "__main__":
     #   Audit enhanced option
     #
 
+    # create enhance run list
+    run_enhanced = [False]
     if enhance:
+        run_enhanced.append(True)
         models_contain_phone_call_model = [model for model in models if model=='phone_call']
         if not models_contain_phone_call_model:
             warning_string = f'Command line option -e, --enhanced specified but phone_call model not specified in models: {models}. Run will include phone_call model'
             warnings.warn(warning_string)
             models.append('phone_call')
+
+
 
