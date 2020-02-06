@@ -1,5 +1,6 @@
 import argparse
 import os
+import warnings
 from model.speech_context import SpeechContext
 from utilities.utilities import Utilities
 
@@ -58,7 +59,9 @@ if __name__ == "__main__":
 
     phrases = list()
 
-    # check phrase file
+    #
+    #   Audit phrase file
+    #
     if phrase_file_path:
         # validate phrase file exists
         try:
@@ -81,4 +84,14 @@ if __name__ == "__main__":
     if boosts and not phrase_file_path:
         raise FileNotFoundError(f'Boosts {boosts} specified, but no phrase file specified.')
 
+    #
+    #   Audit enhanced option
+    #
+
+    if enhance:
+        models_contain_phone_call_model = [model for model in models if model=='phone_call']
+        if not models_contain_phone_call_model:
+            warning_string = f'Command line option -e, --enhanced specified but phone_call model not specified in models: {models}. Run will include phone_call model'
+            warnings.warn(warning_string)
+            models.append('phone_call')
 
