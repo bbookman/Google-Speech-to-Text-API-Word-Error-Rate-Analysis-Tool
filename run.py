@@ -3,6 +3,7 @@ import os
 import warnings
 from model.speech_context import SpeechContext
 from utilities.utilities import Utilities
+from utilities.cloud_storage import GCS
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -107,6 +108,13 @@ if __name__ == "__main__":
     else:
         audio_channel_count = 1
 
+    # Get list of all files in google cloud storage (gcs) bucket
+    gcs = GCS()
+    raw_file_list = gcs.get_file_list(cloud_store_uri)
+
+    # Filter file list
+
+
     # Parse storage uri
-    utils = Utilities()
-    unused_scheme, bucket, unused_path, folder, file = utils.parse_uri(cloud_store_uri)
+    #utils = Utilities()
+    #unused_scheme, bucket, unused_path, folder, file = utils.parse_uri(cloud_store_uri)

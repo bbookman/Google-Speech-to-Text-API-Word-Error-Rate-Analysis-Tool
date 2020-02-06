@@ -1,11 +1,4 @@
 class GCS(object):
-    uri = str()
-
-    def get_uri(self):
-        return self.uri
-
-    def set_uri(self, uri):
-        self.uri = uri
 
     def _parse_uri(self, uri):
         from urllib.parse import urlparse
@@ -25,6 +18,8 @@ class GCS(object):
             blobs = storage_client.list_blobs(bucket, prefix=folder, max_results=10) #  prefix=folder, delimiter='/'
         except StopIteration as s:
             print(s)
+        except IOError as e:
+            print(f'Can not get file list from {uri}: {e}')
 
         for blob in blobs:
             slash_loc = blob.name.rfind('/')
