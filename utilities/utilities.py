@@ -110,5 +110,49 @@ class Utilities():
 
         return True, None
 
+    def parse_uri(self,uri):
+        # if uri = http://hello/world.txt
+        # data.scheme = http
+        # data.netloc = hello
+        # data.path = /world.txt
+        # folder = None ' '
+        # file = world.txt
+        #
+        # if uri = gs://foo/bar/baz/hello.wav
+        # data.scheme = gs
+        # data.netloc = foo
+        # data.path = /bar/baz/hello.wav'
+        # folder = bar/baz/
+        # file = hello.wav
+        # scheme, netloc, path, folder, file
 
+        from urllib.parse import urlparse
+        data = urlparse(uri)
+        ext_in_path = False
+
+        # check for file extension
+        for ext in self.supported_audio_extensions:
+            if ext not in data.path:
+                continue
+            else:
+                ext_in_path = True
+        if 'txt' in data.path:
+            ext_in_path = True
+
+        # if there is an extension, there is a file name. get the file name and folder name
+        if ext_in_path:
+            loc = data.path.rfind("/")
+            file = data.path[loc + 1:]
+            folder = data.path.replace(file, "")
+        else:
+            # no file extension, therefore no file name to return, just get the folder
+            file = None
+            folder = data.path
+        # remove leading slash from folder
+        if folder.find("/") == 0:
+            folder = folder[1:]
+            # remove trailing slash from folder
+        if folder.rfind("/") == len(folder) - 1:
+            folder = folder[:-1]
+        return data.scheme, data.netloc, data.path, folder, file
 

@@ -87,7 +87,6 @@ def test_is_valid_file_extension_false():
     result = u._is_valid_file_extension(extension)
     assert result == expected
 
-
 def test_is_valid_file_extension_true1():
     from utilities.utilities import Utilities
     u = Utilities()
@@ -95,7 +94,6 @@ def test_is_valid_file_extension_true1():
     extension = 'flac'
     result = u._is_valid_file_extension(extension)
     assert result == expected
-
 
 def test_is_valid_file_extension_true2():
     from utilities.utilities import Utilities
@@ -112,7 +110,6 @@ def test_is_audio_homogeneous_false():
     expected = False
     result = u._is_audio_homogeneous(test_list)
     assert result == expected
-
 
 def test_is_audio_homogeneous_true1():
     from utilities.utilities import Utilities
@@ -184,7 +181,7 @@ def test_validate_files_false1():
     from utilities.utilities import Utilities
     u = Utilities()
     expected_bool = False
-    file_list =  ['bar.wav', 'fred.txt', 'baz.txt', 'gs://fooo/baaar/fred.flac', 'zed.ogg', 'foo.raw']
+    file_list = ['bar.wav', 'fred.txt', 'baz.txt', 'gs://fooo/baaar/fred.flac', 'zed.ogg', 'foo.raw']
     result_bool, result_string = u.are_valid_files(file_list)
     assert result_bool == expected_bool
     assert isinstance(result_string, str)
@@ -194,7 +191,7 @@ def test_validate_files_false2_invalid_extension():
     u = Utilities()
     expected_bool = False
     expected_string = 'extension'
-    file_list =  ['bar.wav', 'fred.txt', 'baz.txt', 'fred.flac', 'zed.ogg', 'foo.raw']
+    file_list = ['bar.wav', 'fred.txt', 'baz.txt', 'fred.flac', 'zed.ogg', 'foo.raw']
     result_bool, result_string = u.are_valid_files(file_list)
     assert result_bool == expected_bool
     assert expected_string in result_string
@@ -204,7 +201,7 @@ def test_validate_files_false3_hetero():
     u = Utilities()
     expected_bool = False
     expected_string = 'heterogeneous'
-    file_list =  ['bar.wav', 'fred.txt', 'baz.txt', 'fred.flac', 'gs://sponge_bob/zed.ogg',]
+    file_list = ['bar.wav', 'fred.txt', 'baz.txt', 'fred.flac', 'gs://sponge_bob/zed.ogg', ]
     result_bool, result_string = u.are_valid_files(file_list)
     assert result_bool == expected_bool
     assert expected_string in result_string
@@ -214,7 +211,7 @@ def test_validate_files_false4_no_pair():
     u = Utilities()
     expected_bool = False
     expected_string = 'paired'
-    file_list =  ['gs://flintstone/fred.txt', 'fred.wav', 'wilma.wav', 'betty.wav', 'betty.txt']
+    file_list = ['gs://flintstone/fred.txt', 'fred.wav', 'wilma.wav', 'betty.wav', 'betty.txt']
     result_bool, result_string = u.are_valid_files(file_list)
     assert result_bool == expected_bool
     assert expected_string in result_string
@@ -227,3 +224,29 @@ def test_validate_files_true():
     file_list = ['a.txt', 'a.wav', 'zxy.wav', 'zxy.txt']
     result_bool, result_string = u.are_valid_files(file_list)
     assert result_string == expected_string
+
+def test_parse_uri_1():
+    from utilities.utilities import Utilities
+    u = Utilities()
+    uri = 'gs://foo/bar/baz'
+    expected_bucket = 'foo'
+    expected_folder = 'bar/baz'
+    expected_file = None
+    result_unused_scheme, result_bucket, result_unused_path, result_folder, result_file  = u.parse_uri(uri)
+    assert result_bucket == expected_bucket
+    assert result_folder == expected_folder
+    assert result_file == expected_file
+
+
+def test_parse_uri_2():
+    from utilities.utilities import Utilities
+    u = Utilities()
+    uri = 'gs://foo/bar/baz/test.flac'
+    expected_bucket = 'foo'
+    expected_folder = 'bar/baz'
+    expected_file = 'test.flac'
+    result_unused_scheme, result_bucket, result_unused_path, result_folder, result_file  = u.parse_uri(uri)
+    assert result_bucket == expected_bucket
+    assert result_folder == expected_folder
+    assert result_file == expected_file
+
