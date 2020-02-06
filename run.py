@@ -98,5 +98,13 @@ if __name__ == "__main__":
             warnings.warn(warning_string)
             models.append('phone_call')
 
+    #
+    #   Correctly set multi channel audio_channel_count
+    #
 
+    if args.multi:
+        audio_channel_count = args.multi
+    else:
+        audio_channel_count = 1
 
+    print(audio_channel_count)
