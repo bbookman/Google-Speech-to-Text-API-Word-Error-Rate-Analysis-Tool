@@ -156,3 +156,4 @@ class Utilities():
             folder = folder[:-1]
         return data.scheme, data.netloc, data.path, folder, file
 
+

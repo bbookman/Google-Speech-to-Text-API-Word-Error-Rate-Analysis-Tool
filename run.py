@@ -110,4 +110,3 @@ if __name__ == "__main__":
     # Parse storage uri
     utils = Utilities()
     unused_scheme, bucket, unused_path, folder, file = utils.parse_uri(cloud_store_uri)
-    

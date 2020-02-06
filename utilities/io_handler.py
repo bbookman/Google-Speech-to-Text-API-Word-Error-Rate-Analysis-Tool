@@ -1,4 +1,4 @@
-class Writer(object):
+class IOHandler(object):
     _result_path = ''
     _result_file_name = 'results.csv'
     _csv_header = 'AUDIO_FILE, MODEL, ENHANCED, LANGUAGE, ALTERNATIVE_LANGS, PHRASE_HINTS_APPLIED, BOOST, REF_WORD_COUNT, REF_ERROR_COUNT , WER,STEMMING_APPLIED , STOP_WORDS_REMOVED, NUMBER_TO_WORD_CONVERSION, CONTRACTIONS_EXPANDED\n'
@@ -20,7 +20,12 @@ class Writer(object):
                 os.makedirs(self.get_result_path())
 
             with open(full_path, 'w') as file:
-                file.write(self._csv_header)
+                try:
+                    file.write(self._csv_header)
+                except IOError as i:
+                    print(f'Can not write csv header: {i}')
+                except FileNotFoundError as x:
+                    print(f'Can not find csv file: {x}')
             self._csv_header_written = True
 
     def update_csv(self,
@@ -44,7 +49,11 @@ class Writer(object):
                  f'{boost}, {ref_total_word_count}, {ref_error_count}, {word_error_rate}, {apply_stemming},' \
                  f'{remove_stop_words}, {convert_numbers_to_words}, {expand_contractions}\n'
         with open(full_path, 'a+',) as file:
-            file.write(string)
+            try:
+                file.write(string)
+            except IOError as i:
+                print(f'Can not update csv file: {i}')
+
 
     def write_html_diagnostic(self, hypothesis, reference, audio_file, result_path):
         from utilities.utilities import Utilities
@@ -57,4 +66,27 @@ class Writer(object):
         result_file = root + '.html'
         write_path = f'{result_path}/{result_file}'
         with open(write_path, 'w') as f:
-            f.write(aligned_html)
+            try:
+                f.write(aligned_html)
+            except IOError as i:
+                print(f'Can not write html diagnostic {write_path}: {i}')
+
+    def write_queue_file(self, data):
+        try:
+            with open('queue.txt', 'a+') as f:
+                f.write(data)
+        except IOError as e:
+            print(f'Can not write queue file: {e}')
+
+    def read_queue_file(self):
+        result = None
+        try:
+            with open('queue.txt', 'r') as f:
+                result = f.read()
+        except IOError as e:
+            print(f'Can not read queue file: {e}')
+        except FileNotFoundError as x:
+            print(f'Queue file not found: {f}')
+        return result
+
+

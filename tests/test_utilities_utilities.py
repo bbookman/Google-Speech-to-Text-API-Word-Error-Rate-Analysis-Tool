@@ -219,7 +219,6 @@ def test_validate_files_false4_no_pair():
 def test_validate_files_true():
     from utilities.utilities import Utilities
     u = Utilities()
-    expected_bool = True
     expected_string = None
     file_list = ['a.txt', 'a.wav', 'zxy.wav', 'zxy.txt']
     result_bool, result_string = u.are_valid_files(file_list)
@@ -249,4 +248,3 @@ def test_parse_uri_2():
     assert result_bucket == expected_bucket
     assert result_folder == expected_folder
     assert result_file == expected_file
-
