@@ -107,4 +107,7 @@ if __name__ == "__main__":
     else:
         audio_channel_count = 1
 
-    print(audio_channel_count)
+    # Parse storage uri
+    utils = Utilities()
+    unused_scheme, bucket, unused_path, folder, file = utils.parse_uri(cloud_store_uri)
+    print(bucket)
