@@ -21,6 +21,25 @@ def test_set_then_get_sample_rate_hertz():
     result = config.get_sample_rate_hertz()
     assert result == expected
 
+def test_set_encoding():
+    from model.configuration import Configuration
+    config = Configuration()
+    data = 'MP3'
+    config.set_encoding(data)
+
+def test_get_encoding():
+    from model.configuration import Configuration
+    config = Configuration()
+    config.get_encoding()
+
+def test_set_get_encoding():
+    from model.configuration import Configuration
+    config = Configuration()
+    expected = 'FLAC'
+    config.set_encoding(expected)
+    result = config.get_encoding()
+    assert result == expected
+
 def test_set_audio_channel_count():
     from model.configuration import Configuration
     config = Configuration()
@@ -114,23 +133,16 @@ def test_set_use_enhanced():
     config = Configuration()
     config.set_use_enhanced(True)
 
-def test_set_speech_context():
+def test_set_get_speech_context():
     from model.configuration import Configuration
     config = Configuration()
-    config.speechContext.phrases = "testing"
-    config.speechContext.boost = 65
+    expected_boost = 3
+    expected_phrases = ['foo', 'bar', 'baz']
+    config.set_speech_context(expected_phrases, expected_boost)
+    result = config.get_speech_context()
+    assert result[0]['boost'] == expected_boost
+    assert result[0]['phrases'] == expected_phrases
 
-def test_get_speech_context():
-    from model.configuration import Configuration
-    config = Configuration()
-    config.get_speech_context()
-
-def test_set_speech_context():
-    from model.configuration import Configuration
-    config = Configuration()
-    phrases = ["this", "$OOV"]
-    boost = 3
-    config.set_speech_context(phrases, boost)
 
 def test_str():
     from model.configuration import Configuration

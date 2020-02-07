@@ -1,5 +1,3 @@
-from model.speech_context import SpeechContext
-
 class Configuration(object):
     sampleRateHertz = int()
     audioChannelCount = int()
@@ -8,7 +6,38 @@ class Configuration(object):
     alternative_language_codes = list()
     model = str()
     useEnhanced = False
-    speechContext = SpeechContext()
+    encoding = str()
+    boost = 0
+    phrases = []
+    speech_context_element = {"phrases": phrases, "boost": boost}
+    speech_context = [speech_context_element]
+
+    def _set_boost(self, boost):
+        self.boost = boost
+
+    def _get_boost(self):
+        return self.boost
+
+    def _set_phrases(self, phrases):
+        self.phrases = phrases
+
+    def _get_phrases(self):
+        return self.phrases
+
+    def set_speech_context(self, phrases, boost):
+        self._set_phrases(phrases)
+        self._set_boost(boost)
+        self.speech_context_element['phrases'] = self.phrases
+        self.speech_context_element['boost'] = self.boost
+
+    def get_speech_context(self):
+        return self.speech_context
+
+    def set_encoding(self, encoding):
+        self.encoding = encoding
+
+    def get_encoding(self):
+        return self.encoding
 
     def get_sample_rate_hertz(self):
         return self.sampleRateHertz
@@ -52,12 +81,6 @@ class Configuration(object):
     def set_use_enhanced(self, data):
         self.useEnhanced = data
 
-    def get_speech_context(self):
-        return self.speechContext
-
-    def set_speech_context(self, phrases, boost):
-        self.speechContext.phrases = phrases
-        self.speechContext.boost = boost
 
     def __str__(self):
         string = f'model: {self.model}, ' \
@@ -71,8 +94,7 @@ class Configuration(object):
                       f'audio_channels: {self.audioChannelCount}, ' \
 
         speech_context = self.get_speech_context()
-        phrases = speech_context.get_phrases()
-        if phrases:
-            string += f'phrases: {bool(phrases)}, boost: {speech_context.get_boost()}'
+        if self._get_phrases():
+            string += f'phrases: {bool(self._get_phrases())}, boost: {self._get_boost()}'
         return string
 
