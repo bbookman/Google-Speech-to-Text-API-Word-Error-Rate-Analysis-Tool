@@ -1,6 +1,6 @@
 import pytest
 
-def test_send_request():
+def test_get_hypothesis():
     from model.configuration import Configuration
     from utilities.speech_to_text import SpeechToText
     uri = 'gs://brb/test_audio_n_truth/1.wav'
@@ -10,4 +10,4 @@ def test_send_request():
     configuration_object.set_sample_rate_hertz(44100)
     configuration_object.set_model('default')
     speech = SpeechToText()
-    speech.send_request(uri, configuration_object)
+    result = speech.get_hypothesis(uri, configuration_object)
