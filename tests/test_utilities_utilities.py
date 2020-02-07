@@ -125,7 +125,7 @@ def test_get_audio_set():
     u = Utilities()
     expected = {'a.wav', 'b.wav', 'c.wav'}
     data = ['a.wav', 'foo.txt', 'c.txt', 'b.wav', 'c.wav', 'a.txt', 'b.txt']
-    result = u._get_audio_set(data)
+    result = u.get_audio_set(data)
     assert result == expected
 
 def test_get_ref_set():

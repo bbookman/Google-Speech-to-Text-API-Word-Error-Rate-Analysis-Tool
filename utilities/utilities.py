@@ -45,7 +45,7 @@ class Utilities():
             result = file_name
         return result
 
-    def _get_audio_set(self, file_list):
+    def get_audio_set(self, file_list):
         result = set()
         for file_name in file_list:
             for ext in self.supported_audio_extensions:
@@ -75,7 +75,7 @@ class Utilities():
                 print(f'{file} is not supported and will be ignored')
 
         # If audio is hetero, throw error
-        audio_set = self._get_audio_set(valid_types)
+        audio_set = self.get_audio_set(valid_types)
         ref_set = self._get_ref_set(valid_types)
         audio_extensions = [self._get_extension(audio) for audio in audio_set]
         if len(set(audio_extensions)) > 1:

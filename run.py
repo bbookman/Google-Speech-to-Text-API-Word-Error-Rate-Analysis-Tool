@@ -3,6 +3,7 @@ import os
 import warnings
 from utilities.utilities import Utilities
 from utilities.cloud_storage import GCS
+from utilities.io_handler import IOHandler
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -115,6 +116,17 @@ if __name__ == "__main__":
     utilities = Utilities()
     filtered_file_list = utilities.filter_files(raw_file_list)
 
-    # Parse storage uri
-    #utils = Utilities()
-    #unused_scheme, bucket, unused_path, folder, file = utils.parse_uri(cloud_store_uri)
+
+    # Write queue file if it does not exist
+    io_handler = IOHandler()
+
+    if not os.path.isfile('queue.txt'):
+        print('Writing audio queue')
+        audio_set = utilities.get_audio_set(filtered_file_list)
+        io_handler.write_queue_file(audio_set)
+    else:
+        # Read queue file
+        queue_string = io_handler.read_queue_file()
+        queue = queue_string.split()
+
+    

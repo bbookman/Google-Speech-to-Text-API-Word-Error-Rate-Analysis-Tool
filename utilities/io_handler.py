@@ -2,7 +2,6 @@ class IOHandler(object):
     _result_path = ''
     _result_file_name = 'results.csv'
     _csv_header = 'AUDIO_FILE, MODEL, ENHANCED, LANGUAGE, ALTERNATIVE_LANGS, PHRASE_HINTS_APPLIED, BOOST, REF_WORD_COUNT, REF_ERROR_COUNT , WER,STEMMING_APPLIED , STOP_WORDS_REMOVED, NUMBER_TO_WORD_CONVERSION, CONTRACTIONS_EXPANDED\n'
-
     _csv_header_written = False
 
     def set_result_path(self, result_path):
@@ -74,7 +73,8 @@ class IOHandler(object):
     def write_queue_file(self, data):
         try:
             with open('queue.txt', 'a+') as f:
-                f.write(data)
+                for item in data:
+                    f.write(item + ',')
         except IOError as e:
             print(f'Can not write queue file: {e}')
 
@@ -88,5 +88,6 @@ class IOHandler(object):
         except FileNotFoundError as x:
             print(f'Queue file not found: {f}')
         return result
+
 
 
