@@ -1,7 +1,6 @@
 import argparse
 import os
 import warnings
-from model.speech_context import SpeechContext
 from utilities.utilities import Utilities
 from utilities.cloud_storage import GCS
 
@@ -113,7 +112,8 @@ if __name__ == "__main__":
     raw_file_list = gcs.get_file_list(cloud_store_uri)
 
     # Filter file list
-
+    utilities = Utilities()
+    filtered_file_list = utilities.filter_files(raw_file_list)
 
     # Parse storage uri
     #utils = Utilities()

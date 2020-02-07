@@ -159,6 +159,14 @@ def test_filter_files_orphan_audio():
     result = u.filter_files(data)
     assert result == expected
 
+def test_filter_files_orphan_ref():
+    from utilities.utilities import Utilities
+    u = Utilities()
+    data = ['blah.txt', 'blah.ogg', 'orphan.txt']
+    expected = ['blah.txt', 'blah.ogg']
+    result = u.filter_files(data)
+    assert result == expected
+
 def test_parse_uri_1():
     from utilities.utilities import Utilities
     u = Utilities()

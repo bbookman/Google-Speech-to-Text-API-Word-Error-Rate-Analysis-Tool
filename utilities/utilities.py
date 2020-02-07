@@ -67,7 +67,6 @@ class Utilities():
     def filter_files(self, files):
         import copy
         valid_types = list()
-
         # Remove unsupported file types
         for file in files:
             if self._is_valid_file_extension(self._get_extension(file)):
@@ -87,19 +86,25 @@ class Utilities():
         a_root_set = set(audio_roots)
         ref_roots = [self.get_root_filename(file) for file in ref_set]
         r_root_set = set(ref_roots)
-        d = a_root_set.difference(r_root_set)
-        loners_removed = copy.deepcopy(valid_types)
-        if not d:
-            return valid_types
-        else:
-            for root in d:
+        orphan_audio_files = a_root_set.difference(r_root_set)
+        orphan_audio_removed = copy.deepcopy(valid_types)
+        if orphan_audio_files:
+            for root in orphan_audio_files:
                 for file in valid_types:
                     if root in file:
-                        loners_removed.remove(file)
-            return loners_removed
+                        orphan_audio_removed.remove(file)
+                        print(f'Audio: {file} does not have corresponding reference file and will be ignored')
 
-
-
+        # Remove any reference file that has no corresponding audio file
+        orphan_reference_files = r_root_set.difference(a_root_set)
+        orphan_referance_removed = copy.deepcopy(orphan_audio_removed)
+        if orphan_reference_files:
+            for root in orphan_reference_files:
+                for file in orphan_audio_removed:
+                    if root in file:
+                        orphan_referance_removed.remove(file)
+                        print(f'Reference: {file} does not have corresponding audio file and will be ignored')
+        return orphan_referance_removed
 
 
     def parse_uri(self,uri):
