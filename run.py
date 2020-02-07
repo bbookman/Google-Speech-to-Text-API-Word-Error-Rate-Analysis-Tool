@@ -4,6 +4,7 @@ import warnings
 from utilities.utilities import Utilities
 from utilities.cloud_storage import GCS
 from utilities.io_handler import IOHandler
+from model.configuration import Configuration
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -56,7 +57,8 @@ if __name__ == "__main__":
     language_codes = args.langs
     phrase_file_path = args.phrase_file
     boosts = [int(i) for i in args.boosts]
-    alts = args.alternative_languages
+    boosts.append(0)
+    alternative_language_codes = args.alternative_languages
 
     phrases = list()
 
@@ -70,7 +72,7 @@ if __name__ == "__main__":
         except FileNotFoundError as e:
             print(f'Phrase file not found at {phrase_file_path}')
             print(e)
-        # read phrases
+        # If phrase file exists, read phrases
         try:
             with open(phrase_file_path, 'r') as file:
                 contents = file.read()
@@ -82,7 +84,7 @@ if __name__ == "__main__":
             print(e)
 
     # if boosts exist, there should be phrases
-    if boosts and not phrase_file_path:
+    if boosts !=[0] and not phrase_file_path:
         raise FileNotFoundError(f'Boosts {boosts} specified, but no phrase file specified.')
 
     #
@@ -121,12 +123,43 @@ if __name__ == "__main__":
     io_handler = IOHandler()
 
     if not os.path.isfile('queue.txt'):
-        print('Writing audio queue')
         audio_set = utilities.get_audio_set(filtered_file_list)
         io_handler.write_queue_file(audio_set)
-    else:
-        # Read queue file
-        queue_string = io_handler.read_queue_file()
-        queue = queue_string.split()
 
-    
+    # Read queue
+    queue_string = io_handler.read_queue_file()
+    queue = queue_string.split(',')
+    queue.remove('')
+    # Process Audio
+    for audio in queue:
+        for model in models:
+            for boost in boosts:
+                for language_code in language_codes:
+                    # Run enhanced option only for phone call model
+                    if enhance and model == 'phone_call':
+                        enhanced_runs = [True, False]
+                    else:
+                        enhanced_runs = [False]
+
+                    # Each enhancement option
+                    for use_enhanced in enhanced_runs:
+                        configuration = Configuration()
+                        configuration.set_use_enhanced(use_enhanced)
+                        configuration.set_speech_context(phrases, boost)
+                        configuration.set_alternative_language_codes(alternative_language_codes)
+                        configuration.set_model(model)
+                        configuration.set_sample_rate_hertz(sample_rate_hertz)
+                        configuration.set_language_code(language_code)
+                        if audio_channel_count > 1:
+                            configuration.set_audio_channel_count(audio_channel_count)
+                            configuration.set_enable_separate_recognition_per_channel(True)
+
+                        print('STARTING . . .')
+                        print(f'audio: {audio}, {configuration}')
+
+                        
+
+
+
+
+

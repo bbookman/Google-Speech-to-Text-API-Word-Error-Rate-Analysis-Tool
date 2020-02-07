@@ -67,6 +67,25 @@ def test_set_then_get_language_code():
     result = config.get_language_code()
     assert result == expected
 
+def test_set_alternative_language_codes():
+    from model.configuration import Configuration
+    config = Configuration()
+    codes = ['gu-IN', 'ru-RU']
+    config.set_alternative_language_codes(codes)
+
+def test_get_alternative_language_codes():
+    from model.configuration import Configuration
+    config = Configuration()
+    config.get_alternative_language_codes()
+
+def test_set_get_alternative_language_codes():
+    from model.configuration import Configuration
+    config = Configuration()
+    expected = ['gu-IN', 'ru-RU']
+    config.set_alternative_language_codes(expected)
+    result = config.get_alternative_language_codes()
+    assert result == expected
+
 def test_get_model():
     from model.configuration import Configuration
     config = Configuration()

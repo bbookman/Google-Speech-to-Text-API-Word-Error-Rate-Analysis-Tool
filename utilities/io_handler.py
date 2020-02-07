@@ -77,6 +77,7 @@ class IOHandler(object):
                     f.write(item + ',')
         except IOError as e:
             print(f'Can not write queue file: {e}')
+        print('Writing audio queue')
 
     def read_queue_file(self):
         result = None
@@ -87,6 +88,7 @@ class IOHandler(object):
             print(f'Can not read queue file: {e}')
         except FileNotFoundError as x:
             print(f'Queue file not found: {f}')
+        print('Reading audio queue')
         return result
 
 

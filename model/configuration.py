@@ -3,10 +3,11 @@ from model.speech_context import SpeechContext
 class Configuration(object):
     sampleRateHertz = int()
     audioChannelCount = int()
-    enableSeparateRecognitionPerChannel = bool()
+    enableSeparateRecognitionPerChannel = False
     languageCode = str()
+    alternative_language_codes = list()
     model = str()
-    useEnhanced = bool()
+    useEnhanced = False
     speechContext = SpeechContext()
 
     def get_sample_rate_hertz(self):
@@ -20,6 +21,12 @@ class Configuration(object):
 
     def get_audio_channel_count(self):
         return self.audioChannelCount
+
+    def set_alternative_language_codes(self, data):
+        self.alternative_language_codes = data
+
+    def get_alternative_language_codes(self):
+        return self.alternative_language_codes
 
     def set_enable_separate_recognition_per_channel(self, data):
         self.enableSeparateRecognitionPerChannel = data
@@ -53,13 +60,19 @@ class Configuration(object):
         self.speechContext.boost = boost
 
     def __str__(self):
-        return f'model: {self.model}, ' \
+        string = f'model: {self.model}, ' \
                 f'language_code: {self.languageCode}, ' \
                 f'use_enhanced: {self.useEnhanced}, ' \
-                f'sample_rate: {self.sampleRateHertz}, ' \
-                f'audio_channels: {self.audioChannelCount}, ' \
-                f'enable_sep_channel_rec: {self.enableSeparateRecognitionPerChannel}, ' \
-                f'speech_context: [ ' \
-                f'      phrases: {self.speechContext.phrases}' \
-                f'      boost: {self.speechContext.boost}'
+                f'sample_rate: {self.sampleRateHertz}, '
+
+        audio_channel_count = self.get_audio_channel_count()
+        if audio_channel_count > 1:
+            string += f'enable_sep_channel_rec: {self.enableSeparateRecognitionPerChannel}, ' \
+                      f'audio_channels: {self.audioChannelCount}, ' \
+
+        speech_context = self.get_speech_context()
+        phrases = speech_context.get_phrases()
+        if phrases:
+            string += f'phrases: {bool(phrases)}, boost: {speech_context.get_boost()}'
+        return string
 
