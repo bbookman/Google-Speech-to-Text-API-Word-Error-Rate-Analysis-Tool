@@ -73,8 +73,9 @@ class IOHandler(object):
     def write_queue_file(self, data):
         try:
             with open('queue.txt', 'a+') as f:
-                for item in data:
-                    f.write(item + ',')
+                info = data.split()
+                for item in info:
+                    f.write(item)
         except IOError as e:
             print(f'Can not write queue file: {e}')
         print('Writing audio queue')
@@ -91,5 +92,7 @@ class IOHandler(object):
         print('Reading audio queue')
         return result
 
-
-
+    def write_hyp(self, result_path, file_name, text):
+        p = f'{result_path}/{file_name}'
+        with open(p, 'w') as f:
+            f.write(text)

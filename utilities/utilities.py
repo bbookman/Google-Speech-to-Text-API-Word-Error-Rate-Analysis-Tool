@@ -164,7 +164,8 @@ class Utilities():
     def create_unique_root(self, root, configuration, nlp_model):
         result = root
         result += f'_{configuration.get_model()}'
-        result += f'_{configuration.get_language_code()}'
+        language_code = configuration.get_language_code().replace('-', '_')
+        result += f'_{language_code}'
         if configuration.get_use_enhanced():
             result+= f'_enhanced'
         if configuration.get_alternative_language_codes():
