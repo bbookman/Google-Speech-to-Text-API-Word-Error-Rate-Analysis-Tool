@@ -204,3 +204,46 @@ def test_append_uri_2():
     expected = uri + data
     result = u.append_uri(uri, data)
     assert result == expected
+
+def test_create_unique_root_1():
+    from utilities.utilities import Utilities
+    from model.configuration import Configuration
+    from model.nlp import NLPModel
+    u = Utilities()
+    configuration = Configuration()
+    nlp_model = NLPModel()
+    root = '12345'
+    configuration.set_model('video')
+    configuration.set_use_enhanced(True)
+    configuration.set_language_code('fr_FR')
+    configuration.set_use_enhanced(True)
+    configuration.set_alternative_language_codes(['en-US', 'ru-RU'])
+    configuration.set_speech_context('hi', 5)
+    nlp_model.set_remove_stop_words(True)
+    nlp_model.set_apply_stemming(True)
+    nlp_model.set_expand_contractions(True)
+    nlp_model.set_n2w(True)
+    result = u.create_unique_root(root, configuration, nlp_model)
+    expected = '12345_video_fr_FR_enhanced_alts_applied_speech_adaptation_applied_boost_5_stop_words_removed_stemming_applied_contractions_expanded_numbers_converted_2_words'
+    assert result == expected
+
+def test_create_unique_root_2():
+    from utilities.utilities import Utilities
+    from model.configuration import Configuration
+    from model.nlp import NLPModel
+    u = Utilities()
+    configuration = Configuration()
+    nlp_model = NLPModel()
+    root = '12345'
+    configuration.set_model('video')
+    configuration.set_use_enhanced(False)
+    configuration.set_language_code('fr_FR')
+    configuration.set_alternative_language_codes(['en-US', 'ru-RU'])
+    configuration.set_speech_context('hi', 5)
+    nlp_model.set_remove_stop_words(True)
+    nlp_model.set_apply_stemming(False)
+    nlp_model.set_expand_contractions(True)
+    nlp_model.set_n2w(True)
+    result = u.create_unique_root(root, configuration, nlp_model)
+    expected = '12345_video_fr_FR_alts_applied_speech_adaptation_applied_boost_5_stop_words_removed_contractions_expanded_numbers_converted_2_words'
+    assert result == expected

@@ -126,7 +126,9 @@ def test_set_then_get_model():
 def test_get_use_enhanced():
     from model.configuration import Configuration
     config = Configuration()
-    config.get_use_enhanced()
+    result = config.get_use_enhanced()
+    expected = False
+    assert result == expected
 
 def test_set_use_enhanced():
     from model.configuration import Configuration
@@ -170,6 +172,4 @@ def test_str():
     assert str(expected_sample_rate_hertz) in result
     assert str(expected_audio_channel_count) in result
     assert str(expected_enable_separate_recognition_per_channel) in result
-    for p in expected_phrases:
-        assert p in result
     assert str(expected_boost) in result

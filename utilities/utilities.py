@@ -160,3 +160,25 @@ class Utilities():
         if slash_loc == len(uri) - 1:
             return uri + file
         return uri + '/' + file
+
+    def create_unique_root(self, root, configuration, nlp_model):
+        result = root
+        result += f'_{configuration.get_model()}'
+        result += f'_{configuration.get_language_code()}'
+        if configuration.get_use_enhanced():
+            result+= f'_enhanced'
+        if configuration.get_alternative_language_codes():
+            result+=f'_alts_applied'
+        if configuration.get_speech_context():
+            result+=f'_speech_adaptation_applied'
+            result+= f'_boost_{configuration._get_boost()}'
+        if nlp_model.get_remove_stop_words():
+            result+='_stop_words_removed'
+        if nlp_model.get_apply_stemming():
+            result+='_stemming_applied'
+        if nlp_model.get_expand_contractions():
+            result+= '_contractions_expanded'
+        if nlp_model.get_n2w():
+            result+= '_numbers_converted_2_words'
+
+        return result
