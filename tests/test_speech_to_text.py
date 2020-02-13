@@ -11,3 +11,5 @@ def test_get_hypothesis():
     configuration_object.set_model('default')
     speech = SpeechToText()
     result = speech.get_hypothesis(uri, configuration_object)
+    expected = ' testing 1 2 3  hello hello testing one two three'
+    assert result == expected

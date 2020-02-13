@@ -5,6 +5,7 @@ from utilities.utilities import Utilities
 from utilities.cloud_storage import GCS
 from utilities.io_handler import IOHandler
 from model.configuration import Configuration
+from utilities.speech_to_text import SpeechToText
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -28,7 +29,7 @@ if __name__ == "__main__":
                         help='Space seperated list of models to evaluate.  Example video phone.  Defaults to "default" model')
     parser.add_argument('-e', '--enhanced', default=False, required=False, action='store_true',
                         help="Use the enhanced phone_call model.  Must specify phone_call model in command line")
-    parser.add_argument('-n', '--encoding', default='LINEAR16', required=False,
+    parser.add_argument('-n', '--encoding', required=True,
                         help="Specifies audio encoding type.  See https://cloud.google.com/speech-to-text/docs/encoding#audio-encodings")
     parser.add_argument('-hz', '--sample_rate_hertz', default=48000, type=int, required=False,
                         help="Specifies the sample rate.  Example: 48000")
@@ -59,6 +60,7 @@ if __name__ == "__main__":
     boosts = [int(i) for i in args.boosts]
     boosts.append(0)
     alternative_language_codes = args.alternative_languages
+    encoding = args.encoding
 
     phrases = list()
 
@@ -117,13 +119,14 @@ if __name__ == "__main__":
     # Filter file list
     utilities = Utilities()
     filtered_file_list = utilities.filter_files(raw_file_list)
+    final_file_list = [utilities.append_uri(cloud_store_uri, file) for file in filtered_file_list]
 
 
     # Write queue file if it does not exist
     io_handler = IOHandler()
 
     if not os.path.isfile('queue.txt'):
-        audio_set = utilities.get_audio_set(filtered_file_list)
+        audio_set = utilities.get_audio_set(final_file_list)
         io_handler.write_queue_file(audio_set)
 
     # Read queue
@@ -150,14 +153,21 @@ if __name__ == "__main__":
                         configuration.set_model(model)
                         configuration.set_sample_rate_hertz(sample_rate_hertz)
                         configuration.set_language_code(language_code)
+                        configuration.set_encoding(encoding)
                         if audio_channel_count > 1:
                             configuration.set_audio_channel_count(audio_channel_count)
                             configuration.set_enable_separate_recognition_per_channel(True)
 
                         print('STARTING . . .')
                         print(f'audio: {audio}, {configuration}')
+                        speech_to_text = SpeechToText()
 
 
+
+                        hyp = speech_to_text.get_hypothesis(audio, configuration)
+
+                        #hyp = speech_to_text.get_hypothesis(audio, configuration)
+                        print(hyp)
 
 
 

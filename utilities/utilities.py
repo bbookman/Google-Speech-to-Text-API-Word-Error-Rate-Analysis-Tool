@@ -154,3 +154,9 @@ class Utilities():
         return data.scheme, data.netloc, data.path, folder, file
 
 
+    def append_uri(self, uri, file):
+        result = file.replace('/', '')
+        slash_loc = uri.rfind('/')
+        if slash_loc == len(uri) - 1:
+            return uri + file
+        return uri + '/' + file

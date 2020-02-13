@@ -139,17 +139,11 @@ def test_get_ref_set():
 def test_filter_files_doc():
     from utilities.utilities import Utilities
     u = Utilities()
-    data = ['file.txt', 'hello.doc']
-    expected = ['file.txt']
+    data = ['file.txt', 'hello.doc', 'file.wav']
+    expected = ['file.txt', 'file.wav']
     result = u.filter_files(data)
     assert result == expected
 
-def test_filter_files_homogeneous_audio():
-    from utilities.utilities import Utilities
-    u = Utilities()
-    expected = ['this.flac', 'that.flac', 'other.flac']
-    result = u.filter_files(expected)
-    assert result == expected
 
 def test_filter_files_orphan_audio():
     from utilities.utilities import Utilities
@@ -191,3 +185,22 @@ def test_parse_uri_2():
     assert result_bucket == expected_bucket
     assert result_folder == expected_folder
     assert result_file == expected_file
+
+def test_append_uri_1():
+    from utilities.utilities import Utilities
+    u = Utilities()
+    data = 'this.wav'
+    uri = 'gs://foo/bar'
+    expected = uri + '/' + data
+    result = u.append_uri(uri, data)
+    assert result == expected
+
+
+def test_append_uri_2():
+    from utilities.utilities import Utilities
+    u = Utilities()
+    data = 'this.wav'
+    uri = 'gs://foo/bar/'
+    expected = uri + data
+    result = u.append_uri(uri, data)
+    assert result == expected
