@@ -93,7 +93,7 @@ class Utilities():
                 for file in valid_types:
                     if root in file:
                         orphan_audio_removed.remove(file)
-                        print(f'Audio: {file} does not have corresponding reference file and will be ignored')
+                        print(f'INFO: audio file {file} does not have corresponding reference file and will be ignored')
 
         # Remove any reference file that has no corresponding audio file
         orphan_reference_files = r_root_set.difference(a_root_set)
@@ -103,7 +103,7 @@ class Utilities():
                 for file in orphan_audio_removed:
                     if root in file:
                         orphan_referance_removed.remove(file)
-                        print(f'Reference: {file} does not have corresponding audio file and will be ignored')
+                        print(f'INFO: Reference file {file} does not have corresponding audio file and will be ignored')
         return orphan_referance_removed
 
 

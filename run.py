@@ -6,6 +6,7 @@ from utilities.cloud_storage import GCS
 from utilities.io_handler import IOHandler
 from model.configuration import Configuration
 from utilities.speech_to_text import SpeechToText
+from model.nlp import NLPModel
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -43,14 +44,17 @@ if __name__ == "__main__":
                         help=('Space separated list of boost values to evaluate for speech adaptation'))
     parser.add_argument('-ch', '--multi', required=False, type=int,
                         help='Integer indicating the number of channels if more than one')
+
+    nlp_model = NLPModel()
+    io_handler = IOHandler()
     args = parser.parse_args()
     cloud_store_uri = args.cloud_store_uri
-    local_results_path = args.local_results_path
+    io_handler.set_result_path(args.local_results_path)
     only_transcribe = args.transcriptions_only
-    numbers_to_words = args.numbers_to_words
-    stem = args.stem
-    stop = args.remove_stop_words
-    expand = args.expand
+    nlp_model.set_n2w(args.numbers_to_words)
+    nlp_model.set_apply_stemming(args.stem)
+    nlp_model.set_remove_stop_words(args.remove_stop_words)
+    nlp_model.set_expand_contractions(args.expand)
     models = args.models
     enhance = args.enhanced
     enc = args.encoding
@@ -61,6 +65,7 @@ if __name__ == "__main__":
     boosts.append(0)
     alternative_language_codes = args.alternative_languages
     encoding = args.encoding
+
 
     phrases = list()
 
@@ -123,8 +128,6 @@ if __name__ == "__main__":
 
 
     # Write queue file if it does not exist
-    io_handler = IOHandler()
-
     if not os.path.isfile('queue.txt'):
         audio_set = utilities.get_audio_set(final_file_list)
         io_handler.write_queue_file(audio_set)
@@ -161,13 +164,10 @@ if __name__ == "__main__":
                         print('STARTING . . .')
                         print(f'audio: {audio}, {configuration}')
                         speech_to_text = SpeechToText()
-
-
-
                         hyp = speech_to_text.get_hypothesis(audio, configuration)
-
-                        #hyp = speech_to_text.get_hypothesis(audio, configuration)
-                        print(hyp)
+                        root = utilities.get_root_filename(audio)
+                        file_name = utilities .create_unique_root(root, configuration, nlp_model)
+                        io_handler.write_hyp(file_name=file_name + '.txt', text=hyp)
 
 
 

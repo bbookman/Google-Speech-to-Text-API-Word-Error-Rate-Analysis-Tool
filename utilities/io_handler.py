@@ -73,12 +73,16 @@ class IOHandler(object):
     def write_queue_file(self, data):
         try:
             with open('queue.txt', 'a+') as f:
-                info = data.split()
+                if isinstance(data, str):
+                    info = data.split()
+                else:
+                    info = data
                 for item in info:
-                    f.write(item)
+                    f.write(item + ',')
         except IOError as e:
             print(f'Can not write queue file: {e}')
         print('Writing audio queue')
+
 
     def read_queue_file(self):
         result = None
@@ -89,10 +93,18 @@ class IOHandler(object):
             print(f'Can not read queue file: {e}')
         except FileNotFoundError as x:
             print(f'Queue file not found: {f}')
+        if not result:
+            raise IOError('No contents found in queue')
         print('Reading audio queue')
         return result
 
-    def write_hyp(self, result_path, file_name, text):
-        p = f'{result_path}/{file_name}'
-        with open(p, 'w') as f:
+    def write_hyp(self, file_name, text):
+        import os.path
+
+        if not os.path.exists(self.get_result_path()):
+            os.makedirs(self.get_result_path())
+
+        p = f'{self.get_result_path()}/{file_name}'
+
+        with open(p, 'w+') as f:
             f.write(text)
