@@ -1,7 +1,7 @@
 class IOHandler(object):
     _result_path = ''
     _result_file_name = 'results.csv'
-    _csv_header = 'AUDIO_FILE, MODEL, ENHANCED, LANGUAGE, ALTERNATIVE_LANGS, PHRASE_HINTS_APPLIED, BOOST, REF_WORD_COUNT, REF_ERROR_COUNT , WER,STEMMING_APPLIED , STOP_WORDS_REMOVED, NUMBER_TO_WORD_CONVERSION, CONTRACTIONS_EXPANDED\n'
+    _csv_header = 'AUDIO_FILE, MODEL, ENHANCED, LANGUAGE, ALTERNATIVE_LANGS, Reading audio queueASE_HINTS_APPLIED, BOOST, REF_WORD_COUNT, REF_ERROR_COUNT , WER,STEMMING_APPLIED , STOP_WORDS_REMOVED, NUMBER_TO_WORD_CONVERSION, CONTRACTIONS_EXPANDED\n'
     _csv_header_written = False
 
     def set_result_path(self, result_path):
@@ -56,9 +56,6 @@ class IOHandler(object):
 
 
     def write_html_diagnostic(self, wer_obj, unique_root, result_path):
-        from utilities.utilities import Utilities
-
-        wer_obj.AddHypRef(hypothesis, reference)
         aligned_html = '<br>'.join(wer_obj.aligned_htmls)
 
         result_file = unique_root + '.html'
@@ -95,7 +92,6 @@ class IOHandler(object):
             print(f'Queue file not found: {f}')
         if not result:
             raise IOError('No contents found in queue')
-        print('Reading audio queue')
         return result
 
     def write_hyp(self, file_name, text):

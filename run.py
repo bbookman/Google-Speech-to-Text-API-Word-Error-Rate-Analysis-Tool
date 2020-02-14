@@ -135,6 +135,7 @@ if __name__ == "__main__":
         io_handler.write_queue_file(audio_set)
 
     # Read queue
+    print('READ: queue.txt')
     queue_string = io_handler.read_queue_file()
     queue = queue_string.split(',')
     queue.remove('')
@@ -163,17 +164,23 @@ if __name__ == "__main__":
                             configuration.set_audio_channel_count(audio_channel_count)
                             configuration.set_enable_separate_recognition_per_channel(True)
 
-                        print('STARTING . . .')
+                        print(f'STARTING')
                         print(f'audio: {audio}, {configuration}')
+
+                        # Read reference
+                        root = utilities.get_root_filename(audio)
+                        print(f'READING: Reference file {cloud_store_uri}/{root}.txt')
+                        ref = gcs.read_ref(cloud_store_uri, root + '.txt')
+
+                        # Generate hyp
                         speech_to_text = SpeechToText()
                         hyp = speech_to_text.get_hypothesis(audio, configuration)
-                        root = utilities.get_root_filename(audio)
+
                         unique_root = utilities.create_unique_root(root, configuration, nlp_model)
                         io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
 
 
                         # Calculate WER
-                        ref = gcs.read_ref(cloud_store_uri, root+'.txt')
                         wer_obj = SimpleWER()
                         wer_obj.AddHypRef(hyp, ref)
                         wer , ref_word_count, ref_error_count = wer_obj.GetWER()
@@ -188,6 +195,8 @@ if __name__ == "__main__":
                                               ref_word_count, ref_error_count, wer)
 
                         io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
+
+    print('Done')
 
 
 
