@@ -52,6 +52,7 @@ class IOHandler(object):
                 file.write(string)
             except IOError as i:
                 print(f'Can not update csv file: {i}')
+        print(f'UPDATED: {full_path}')
 
 
     def write_html_diagnostic(self, hypothesis, reference, audio_file, result_path):

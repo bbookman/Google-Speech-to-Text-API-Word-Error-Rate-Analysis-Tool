@@ -7,6 +7,7 @@ from utilities.io_handler import IOHandler
 from model.configuration import Configuration
 from utilities.speech_to_text import SpeechToText
 from model.nlp import NLPModel
+from utilities.wer import SimpleWER
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -169,6 +170,21 @@ if __name__ == "__main__":
                         file_name = utilities .create_unique_root(root, configuration, nlp_model)
                         io_handler.write_hyp(file_name=file_name + '.txt', text=hyp)
 
+
+                        # Calculate WER
+                        ref = gcs.read_ref(cloud_store_uri, root+'.txt')
+                        wer_obj = SimpleWER()
+                        wer_obj.AddHypRef(hyp, ref)
+                        wer , ref_word_count, ref_error_count = wer_obj.GetWER()
+
+                        # Write results
+                        io_handler.write_csv_header()
+                        io_handler.update_csv(cloud_store_uri, model, use_enhanced,
+                                              nlp_model.get_apply_stemming(), nlp_model.get_remove_stop_words(),
+                                              nlp_model.get_expand_contractions(), nlp_model.get_n2w(),
+                                              configuration.get_language_code(), configuration.get_alternative_language_codes(),
+                                              boost, bool(configuration.get_speech_context()),
+                                              ref_word_count, ref_error_count, wer)
 
 
 

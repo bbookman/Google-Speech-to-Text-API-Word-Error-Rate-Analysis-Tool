@@ -329,7 +329,8 @@ class SimpleWER(object):
     nref = max(1, nref)  # non_zero value for division
     total_error = self.wer_info['ins'] \
         + self.wer_info['del'] + self.wer_info['sub']
-    return total_error * 100.0 / nref
+    wer = total_error * 100.0 / nref
+    return round(wer, 4), nref, total_error
 
   def GetKeyPhraseStats(self):
     """Measure the Jaccard similarity of key phrases between hyps and refs.
