@@ -87,7 +87,7 @@ class Configuration(object):
                 f'language_code: {self.languageCode}, ' \
                 f'use_enhanced: {self.useEnhanced}, ' \
                 f'sample_rate: {self.sampleRateHertz}, ' \
-                f'encoding: {self.encoding}'
+                f'encoding: {self.encoding}, '
 
         audio_channel_count = self.get_audio_channel_count()
         if audio_channel_count > 1:
