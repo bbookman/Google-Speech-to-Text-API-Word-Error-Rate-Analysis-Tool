@@ -90,6 +90,7 @@ if __name__ == "__main__":
         except IOError as e:
             print(f'Could not open phrases file {phrase_file_path}')
             print(e)
+            os.exit()
 
     # if boosts exist, there should be phrases
     if boosts !=[0] and not phrase_file_path:
