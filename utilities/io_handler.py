@@ -55,21 +55,20 @@ class IOHandler(object):
         print(f'UPDATED: {full_path}')
 
 
-    def write_html_diagnostic(self, hypothesis, reference, audio_file, result_path):
+    def write_html_diagnostic(self, wer_obj, unique_root, result_path):
         from utilities.utilities import Utilities
-        from utilities.wer import SimpleWER
-        wer_obj = SimpleWER()
+
         wer_obj.AddHypRef(hypothesis, reference)
         aligned_html = '<br>'.join(wer_obj.aligned_htmls)
-        u = Utilities()
-        root = u.get_root_filename(audio_file)
-        result_file = root + '.html'
+
+        result_file = unique_root + '.html'
         write_path = f'{result_path}/{result_file}'
         with open(write_path, 'w') as f:
             try:
                 f.write(aligned_html)
             except IOError as i:
                 print(f'Can not write html diagnostic {write_path}: {i}')
+        print(f'WROTE: diagnostic file: {write_path} ')
 
     def write_queue_file(self, data):
         try:
@@ -81,8 +80,8 @@ class IOHandler(object):
                 for item in info:
                     f.write(item + ',')
         except IOError as e:
-            print(f'Can not write queue file: {e}')
-        print('Writing audio queue')
+            print(f'Can not write diagnostic file: {e}')
+        print('WROTE: queue file queue.txt')
 
 
     def read_queue_file(self):

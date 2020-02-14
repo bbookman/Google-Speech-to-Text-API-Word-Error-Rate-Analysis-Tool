@@ -167,8 +167,8 @@ if __name__ == "__main__":
                         speech_to_text = SpeechToText()
                         hyp = speech_to_text.get_hypothesis(audio, configuration)
                         root = utilities.get_root_filename(audio)
-                        file_name = utilities .create_unique_root(root, configuration, nlp_model)
-                        io_handler.write_hyp(file_name=file_name + '.txt', text=hyp)
+                        unique_root = utilities.create_unique_root(root, configuration, nlp_model)
+                        io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
 
 
                         # Calculate WER
@@ -185,6 +185,8 @@ if __name__ == "__main__":
                                               configuration.get_language_code(), configuration.get_alternative_language_codes(),
                                               boost, bool(configuration.get_speech_context()),
                                               ref_word_count, ref_error_count, wer)
+
+                        io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
 
 
 
