@@ -8,8 +8,14 @@ from model.configuration import Configuration
 from utilities.speech_to_text import SpeechToText
 from model.nlp import NLPModel
 from utilities.wer import SimpleWER
+import logging
 
 if __name__ == "__main__":
+
+    #logging setup
+    logging.basicConfig(filename='wer_app.log', level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-cs', '--cloud_store_uri',
                         help="Cloud storage uri where audio and ground truth expected reference transcriptions are stored",
@@ -90,12 +96,13 @@ if __name__ == "__main__":
         except IOError as e:
             print(f'Could not open phrases file {phrase_file_path}')
             print(e)
-            os.exit()
 
+    logging.info(f'PHRASES: {phrases}')
     # if boosts exist, there should be phrases
     if boosts !=[0] and not phrase_file_path:
         raise FileNotFoundError(f'Boosts {boosts} specified, but no phrase file specified.')
 
+    logging.info(f'BOOSTS: {boosts}')
     #
     #   Audit enhanced option
     #
@@ -110,6 +117,7 @@ if __name__ == "__main__":
             warnings.warn(warning_string)
             models.append('phone_call')
 
+    logging.info(f'ENHANCED OPTIONS: '{run_enhanced})
     #
     #   Correctly set multi channel audio_channel_count
     #
@@ -119,26 +127,27 @@ if __name__ == "__main__":
     else:
         audio_channel_count = 1
 
+    logging.info(f'AUDIO CHANNEL COUNT: {audio_channel_count}')
     # Get list of all files in google cloud storage (gcs) bucket
     gcs = GCS()
     raw_file_list = gcs.get_file_list(cloud_store_uri)
-
+    logging.info(f'RAW STORAGE FILE LIST: {raw_file_list}')
     # Filter file list
     utilities = Utilities()
     filtered_file_list = utilities.filter_files(raw_file_list)
     final_file_list = [utilities.append_uri(cloud_store_uri, file) for file in filtered_file_list]
-
+    logging.info(f'FILE LIST FOR PROCESSING:' {final_file_list})
 
     # Write queue file if it does not exist
     if not os.path.isfile('queue.txt'):
         audio_set = utilities.get_audio_set(final_file_list)
         io_handler.write_queue_file(audio_set)
-
     # Read queue
     print('READ: queue.txt')
     queue_string = io_handler.read_queue_file()
     queue = queue_string.split(',')
     queue.remove('')
+    logging.info(f'QUEUE: {queue}')
     # Process Audio
     for audio in queue:
         for model in models:
@@ -164,12 +173,17 @@ if __name__ == "__main__":
                             configuration.set_audio_channel_count(audio_channel_count)
                             configuration.set_enable_separate_recognition_per_channel(True)
 
+                        logging.info(f'CONFIGURATION: {configuration}')
                         print(f'STARTING')
-                        print(f'audio: {audio}, {configuration}')
+                        msg = f'audio: {audio}, {configuration}'
+                        logging.info(msg)
+                        print(msg)
 
                         # Read reference
                         root = utilities.get_root_filename(audio)
-                        print(f'READING: Reference file {cloud_store_uri}/{root}.txt')
+                        msg = f'READING: Reference file {cloud_store_uri}/{root}.txt'
+                        print(msg)
+                        logging.info(msg)
                         ref = gcs.read_ref(cloud_store_uri, root + '.txt')
 
                         # Generate hyp
@@ -184,6 +198,7 @@ if __name__ == "__main__":
                         wer_obj = SimpleWER()
                         wer_obj.AddHypRef(hyp, ref)
                         wer , ref_word_count, ref_error_count = wer_obj.GetWER()
+                        logging.info(f'STATS: wer = {wer}, ref words = {ref_word_count}, number of errors = {ref_error_count}')
 
                         # Write results
                         io_handler.write_csv_header()

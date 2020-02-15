@@ -1,3 +1,5 @@
+import logging
+
 class GCS(object):
 
     def _parse_uri(self, uri):
@@ -6,6 +8,7 @@ class GCS(object):
         bucket = data.netloc
         folder = data.path[1:]
         f = folder.replace('/', '')
+
         return bucket, f
 
     def get_file_list(self, uri):
