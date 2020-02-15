@@ -97,7 +97,13 @@ if __name__ == "__main__":
             print(f'Could not open phrases file {phrase_file_path}')
             print(e)
 
-    logging.info(f'PHRASES: {phrases}')
+    if phrases:
+        speech_context_runs = [False, True]
+        logging.info(f'PHRASES: {phrases}')
+    else:
+        speech_context_runs = [False]
+        logging.info('NO SPEECH CONTEXT IN USE')
+
     # if boosts exist, there should be phrases
     if boosts !=[0] and not phrase_file_path:
         raise FileNotFoundError(f'Boosts {boosts} specified, but no phrase file specified.')
@@ -117,7 +123,7 @@ if __name__ == "__main__":
             warnings.warn(warning_string)
             models.append('phone_call')
 
-    logging.info(f'ENHANCED OPTIONS: '{run_enhanced})
+    logging.info(f'ENHANCED OPTIONS: {run_enhanced}')
     #
     #   Correctly set multi channel audio_channel_count
     #
@@ -159,57 +165,61 @@ if __name__ == "__main__":
                     else:
                         enhanced_runs = [False]
 
+                    if phrases:
+                        phrase_runs = [False, True]
+
                     # Each enhancement option
                     for use_enhanced in enhanced_runs:
-                        configuration = Configuration()
-                        configuration.set_use_enhanced(use_enhanced)
-                        configuration.set_speech_context(phrases, boost)
-                        configuration.set_alternative_language_codes(alternative_language_codes)
-                        configuration.set_model(model)
-                        configuration.set_sample_rate_hertz(sample_rate_hertz)
-                        configuration.set_language_code(language_code)
-                        configuration.set_encoding(encoding)
-                        if audio_channel_count > 1:
-                            configuration.set_audio_channel_count(audio_channel_count)
-                            configuration.set_enable_separate_recognition_per_channel(True)
+                        for run in phrase_runs:
+                            configuration = Configuration()
+                            configuration.set_use_enhanced(use_enhanced)
+                            configuration.set_speech_context(phrases, boost)
+                            configuration.set_alternative_language_codes(alternative_language_codes)
+                            configuration.set_model(model)
+                            configuration.set_sample_rate_hertz(sample_rate_hertz)
+                            configuration.set_language_code(language_code)
+                            configuration.set_encoding(encoding)
+                            if audio_channel_count > 1:
+                                configuration.set_audio_channel_count(audio_channel_count)
+                                configuration.set_enable_separate_recognition_per_channel(True)
 
-                        logging.info(f'CONFIGURATION: {configuration}')
-                        print(f'STARTING')
-                        msg = f'audio: {audio}, {configuration}'
-                        logging.info(msg)
-                        print(msg)
+                            logging.info(f'CONFIGURATION: {configuration}')
+                            print(f'STARTING')
+                            msg = f'audio: {audio}, {configuration}'
+                            logging.info(msg)
+                            print(msg)
 
-                        # Read reference
-                        root = utilities.get_root_filename(audio)
-                        msg = f'READING: Reference file {cloud_store_uri}/{root}.txt'
-                        print(msg)
-                        logging.info(msg)
-                        ref = gcs.read_ref(cloud_store_uri, root + '.txt')
+                            # Read reference
+                            root = utilities.get_root_filename(audio)
+                            msg = f'READING: Reference file {cloud_store_uri}/{root}.txt'
+                            print(msg)
+                            logging.info(msg)
+                            ref = gcs.read_ref(cloud_store_uri, root + '.txt')
 
-                        # Generate hyp
-                        speech_to_text = SpeechToText()
-                        hyp = speech_to_text.get_hypothesis(audio, configuration)
+                            # Generate hyp
+                            speech_to_text = SpeechToText()
+                            hyp = speech_to_text.get_hypothesis(audio, configuration)
 
-                        unique_root = utilities.create_unique_root(root, configuration, nlp_model)
-                        io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
+                            unique_root = utilities.create_unique_root(root, configuration, nlp_model)
+                            io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
 
 
-                        # Calculate WER
-                        wer_obj = SimpleWER()
-                        wer_obj.AddHypRef(hyp, ref)
-                        wer , ref_word_count, ref_error_count = wer_obj.GetWER()
-                        logging.info(f'STATS: wer = {wer}, ref words = {ref_word_count}, number of errors = {ref_error_count}')
+                            # Calculate WER
+                            wer_obj = SimpleWER()
+                            wer_obj.AddHypRef(hyp, ref)
+                            wer , ref_word_count, ref_error_count = wer_obj.GetWER()
+                            logging.info(f'STATS: wer = {wer}, ref words = {ref_word_count}, number of errors = {ref_error_count}')
 
-                        # Write results
-                        io_handler.write_csv_header()
-                        io_handler.update_csv(cloud_store_uri, model, use_enhanced,
-                                              nlp_model.get_apply_stemming(), nlp_model.get_remove_stop_words(),
-                                              nlp_model.get_expand_contractions(), nlp_model.get_n2w(),
-                                              configuration.get_language_code(), configuration.get_alternative_language_codes(),
-                                              boost, bool(configuration.get_speech_context()),
-                                              ref_word_count, ref_error_count, wer)
+                            # Write results
+                            io_handler.write_csv_header()
+                            io_handler.update_csv(cloud_store_uri, model, use_enhanced,
+                                                  nlp_model.get_apply_stemming(), nlp_model.get_remove_stop_words(),
+                                                  nlp_model.get_expand_contractions(), nlp_model.get_n2w(),
+                                                  configuration.get_language_code(), configuration.get_alternative_language_codes(),
+                                                  boost, bool(configuration.get_speech_context()),
+                                                  ref_word_count, ref_error_count, wer)
 
-                        io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
+                            io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
 
     print('Done')
 
