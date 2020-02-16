@@ -15,7 +15,7 @@ class Configuration(object):
     def _set_boost(self, boost):
         self.boost = boost
 
-    def _get_boost(self):
+    def get_boost(self):
         return self.boost
 
     def _set_phrases(self, phrases):
@@ -80,7 +80,6 @@ class Configuration(object):
 
     def set_use_enhanced(self, data):
         self.useEnhanced = data
-
 
     def __str__(self):
         string = f'model: {self.model}, ' \
