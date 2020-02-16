@@ -72,7 +72,14 @@ def test_write_csv_verify_header():
 
 def test_update_csv():
     from utilities.io_handler import IOHandler
+    from model.configuration import Configuration
+    from model.nlp import NLPModel
     import os
+    configuration = Configuration()
+    nlp_model = NLPModel()
+
+    configuration.set_language_code()
+
     io = IOHandler()
     result_file_name = io._result_file_name
     io.set_result_path('test_results_path')
@@ -80,20 +87,10 @@ def test_update_csv():
     expected_uri = 'gs://foo/bar/baz/test.flac'
     expected_lang = 'fr-FR'
     expected_boost = '341'
-    io.update_csv(uri = expected_uri,
-                      model = 'default',
-                      use_enhanced=False,
-                      apply_stemming = False,
-                      remove_stop_words = False,
-                      expand_contractions = False,
-                      convert_numbers_to_words = False,
-                      language_code= expected_lang,
-                      alternative_language_codes = None,
-                      boost = expected_boost,
-                      phrase_hints_in_use = False,
-                      ref_total_word_count = 0,
-                      ref_error_count = 0,
-                      word_error_rate =0, )
+
+    configuration.set_language_code(expected_lang)
+    configuration._set_boost(expected_boost)
+    io.update_csv(expected_uri, configuration, nlp_model)
     full_path = f'{io.get_result_path()}/{result_file_name}'
 
     with open(full_path, 'r') as file:
@@ -169,7 +166,7 @@ def test_write_read_queue():
     import os
     io = IOHandler()
     file = 'queue.txt'
-    expected = 'root,roll,rock'
+    expected = 'root,roll,rock,'
     io.write_queue_file(expected)
     result = io.read_queue_file()
     os.remove(file)
