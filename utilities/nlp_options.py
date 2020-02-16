@@ -1,37 +1,10 @@
 class NLPOptions(object):
-    should_expand_contractions = bool()
-    should_apply_stemming = bool()
-    should_convert_numbers_to_words = bool()
-    should_remove_stop_words = bool()
+
     contractions = None
 
     def __init__(self):
         from utilities.contractions import contractions_dictionary
         self.contractions = contractions_dictionary
-
-    def set_should_expand_contractions(self, option):
-        self.should_expand_contractions = option
-
-    def get_should_expand_contractions(self):
-        return self.should_expand_contractions
-
-    def set_should_apply_stemming(self, option):
-        self.should_apply_stemming = option
-
-    def get_should_apply_stemming(self):
-        return self.should_apply_stemming
-
-    def set_should_convert_numbers_to_words(self, option):
-        self.should_convert_numbers_to_words = option
-
-    def get_should_convert_numbers_to_words(self):
-        return self.should_convert_numbers_to_words
-
-    def set_should_remove_stop_words(self, option):
-        self.should_remove_stop_words = option
-
-    def get_should_remove_stop_words(self):
-        return self.should_remove_stop_words
 
 
     def expand_contractions(self, text):

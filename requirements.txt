@@ -1,1 +1,3 @@
-pytest
+inflect
+google.cloud.speech
+google.cloud.storage
