@@ -1,5 +1,6 @@
+from model.nlp import NLPModel
 class NLPOptions(object):
-
+    nlp_model = NLPModel()
     contractions = None
 
     def __init__(self):
@@ -69,3 +70,67 @@ class NLPOptions(object):
         for w in words:
             results += (ps.stem(w) + " ")
         return results
+
+    def apply_nlp_options(self, nlp_model, hyp):
+        stem = nlp_model.get_apply_stemming()
+        stop = nlp_model.get_remove_stop_words()
+        n2w = nlp_model.get_n2w()
+        exp = nlp_model.get_expand_contractions()
+
+        if stem and not stop and not n2w and not exp:
+            return self.apply_stemming(hyp)
+        elif not stem and stop and not n2w and not exp:
+            return self.remove_stop_words(hyp)
+        elif not stem and not stop and n2w and not exp:
+            return self.convert_numbers_to_words(hyp)
+        elif not stem and not stop and not n2w and exp:
+            return self.expand_contractions(hyp)
+        elif stem and stop and not n2w and not exp:
+            step_one = self.remove_stop_words(hyp)
+            return self.apply_stemming(step_one)
+        elif stem and not stop and n2w and not exp:
+            step_one = self.convert_numbers_to_words(hyp)
+            return self.apply_stemming(step_one)
+        elif stem and not stop and not n2w and exp:
+            step_one = self.expand_contractions(hyp)
+            return self.apply_stemming(step_one)
+        elif not stem and stop and n2w and not exp:
+            step_one = self.convert_numbers_to_words(hyp)
+            return self.remove_stop_words(step_one)
+        elif not stem and not stop and n2w and exp:
+            step_one = self.expand_contractions(hyp)
+            return self.convert_numbers_to_words(step_one)
+        elif not stem and stop and n2w and exp:
+            step_one = self.expand_contractions(hyp)
+            step_two = self.convert_numbers_to_words(step_one)
+            return self.remove_stop_words(step_two)
+        elif stem and not stop and n2w and exp:
+            step_one = self.expand_contractions(hyp)
+            step_two = self.convert_numbers_to_words(step_one)
+            return self.apply_stemming(step_two)
+        elif stem and stop and n2w and not exp:
+            step_one = self.convert_numbers_to_words(hyp)
+            step_two = self.remove_stop_words(step_one)
+            return self.apply_stemming(step_two)
+        elif stem and stop and not n2w and exp:
+            step_one = self.expand_contractions(hyp)
+            step_two = self.remove_stop_words(step_one)
+            return self.apply_stemming(step_two)
+        elif stem and stop and n2w and not exp:
+            step_one = self.convert_numbers_to_words(hyp)
+            step_two = self.remove_stop_words(step_one)
+            return self.apply_stemming(step_two)
+        elif stem and stop and n2w and exp:
+            step_one = self.expand_contractions(hyp)
+            step_two = self.convert_numbers_to_words(step_one)
+            step_three = self.remove_stop_words(step_two)
+            return self.apply_stemming(step_three)
+
+
+
+
+
+
+
+
+
