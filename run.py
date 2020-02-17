@@ -7,6 +7,7 @@ from utilities.io_handler import IOHandler
 from model.configuration import Configuration
 from utilities.speech_to_text import SpeechToText
 from model.nlp import NLPModel
+from utilities.nlp_options import NLPOptions
 from utilities.wer import SimpleWER
 import logging
 
@@ -54,6 +55,7 @@ if __name__ == "__main__":
 
     nlp_model = NLPModel()
     io_handler = IOHandler()
+    nlp_options = NLPOptions()
     args = parser.parse_args()
     cloud_store_uri = args.cloud_store_uri
     io_handler.set_result_path(args.local_results_path)
@@ -173,7 +175,8 @@ if __name__ == "__main__":
                         for run in phrase_runs:
                             configuration = Configuration()
                             configuration.set_use_enhanced(use_enhanced)
-                            configuration.set_speech_context(phrases, boost)
+                            if run:
+                                configuration.set_speech_context(phrases, boost)
                             configuration.set_alternative_language_codes(alternative_language_codes)
                             configuration.set_model(model)
                             configuration.set_sample_rate_hertz(sample_rate_hertz)
@@ -200,7 +203,7 @@ if __name__ == "__main__":
                             speech_to_text = SpeechToText()
                             hyp = speech_to_text.get_hypothesis(audio, configuration)
 
-                            unique_root = utilities.create_unique_root(root, configuration, nlp_model)
+                            unique_root = utilities.create_unique_root(root, configuration)
                             io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
 
 
@@ -208,18 +211,44 @@ if __name__ == "__main__":
                             wer_obj = SimpleWER()
                             wer_obj.AddHypRef(hyp, ref)
                             wer , ref_word_count, ref_error_count = wer_obj.GetWER()
-                            logging.info(f'STATS: wer = {wer}, ref words = {ref_word_count}, number of errors = {ref_error_count}')
+                            string = f'STATS: wer = {wer}, ref words = {ref_word_count}, number of errors = {ref_error_count}'
+                            print(string)
+                            logging.info(string)
+
+                            #Remove hyp/ref from WER
+                            wer_obj.AddHypRef('', '')
 
                             # Write results
                             io_handler.write_csv_header()
-                            io_handler.update_csv(cloud_store_uri, model, use_enhanced,
-                                                  nlp_model.get_apply_stemming(), nlp_model.get_remove_stop_words(),
-                                                  nlp_model.get_expand_contractions(), nlp_model.get_n2w(),
-                                                  configuration.get_language_code(), configuration.get_alternative_language_codes(),
-                                                  boost, bool(configuration.get_speech_context()),
+                            io_handler.update_csv(cloud_store_uri, configuration, nlp_model,
                                                   ref_word_count, ref_error_count, wer)
 
                             io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
+
+                            # Get NLP results
+                            nlp_result = nlp_options.apply_nlp_options(nlp_model, hyp)
+
+                            # Get WER
+                            wer_obj.AddHypRef(nlp_result, ref)
+                            wer, ref_word_count, ref_error_count = wer_obj.GetWER()
+                            string = f'stop: {nlp_model.get_remove_stop_words()}, stem: {nlp_model.get_apply_stemming()}, n2w: {nlp_model.get_n2w()}, exp: {nlp_model.get_expand_contractions()}'
+                            print(string)
+                            logging.info(string)
+                            string = f'STATS: wer = {wer}, ref words = {ref_word_count}, number of errors = {ref_error_count}'
+                            print(string)
+                            logging.info(string)
+
+                            # Write hyp
+                            unique_root = utilities.create_unique_root(root, configuration, nlp_model)
+                            io_handler.write_hyp(file_name=unique_root + '.txt', text=nlp_result)
+
+                            # Write diagnostic
+
+                            io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
+
+                            # Update csv
+                            io_handler.update_csv(cloud_store_uri, configuration, nlp_model,
+                                                  ref_word_count, ref_error_count, wer)
 
     print('Done')
 

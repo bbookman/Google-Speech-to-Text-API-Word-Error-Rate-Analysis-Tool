@@ -161,7 +161,7 @@ class Utilities():
             return uri + file
         return uri + '/' + file
 
-    def create_unique_root(self, root, configuration, nlp_model):
+    def create_unique_root(self, root, configuration, nlp_model=None):
         result = root
         result += f'_{configuration.get_model()}'
         language_code = configuration.get_language_code().replace('-', '_')
