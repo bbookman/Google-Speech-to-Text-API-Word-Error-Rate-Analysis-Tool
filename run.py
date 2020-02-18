@@ -153,6 +153,9 @@ if __name__ == "__main__":
         print(item)
     confirm = input('\n\nProcess the above files (Y/N)? ')
     if confirm.lower() == 'n':
+        if os.path.isfile('queue.txt'):
+            print('Removing existing queue file')
+            os.remove('queue.txt')
         sys.exit(0)
     else:
         print()
@@ -165,9 +168,12 @@ if __name__ == "__main__":
             'Queue file found, continue aborted run (Y/N).  Choosing N will delete existing queue file: ')
         if delete_queue:
             os.remove('queue.txt')
+            print('DELETED: Existing queue.txt')
+
 
     audio_set = utilities.get_audio_set(final_file_list)
     io_handler.write_queue_file(audio_set)
+    print('WRITE: queue.txt\n')
 
     confirm = input(f'models: {models} \n'
                     f'enhanced: {enhance}\n'
@@ -290,6 +296,8 @@ if __name__ == "__main__":
                                                   ref_word_count, ref_error_count, wer)
 
     print('Done')
+    print('Deleting queue')
+    os.remove('queue.txt')
 
 
 

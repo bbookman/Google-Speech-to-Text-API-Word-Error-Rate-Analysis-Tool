@@ -77,7 +77,6 @@ class IOHandler(object):
                     f.write(item + ',')
         except IOError as e:
             print(f'Can not write diagnostic file: {e}')
-        print('WROTE: queue file queue.txt\n')
 
 
     def read_queue_file(self):
