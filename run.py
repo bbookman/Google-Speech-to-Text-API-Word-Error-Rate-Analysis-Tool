@@ -1,5 +1,5 @@
 import argparse
-import os
+import os, sys
 import warnings
 from utilities.utilities import Utilities
 from utilities.cloud_storage import GCS
@@ -76,6 +76,7 @@ if __name__ == "__main__":
     encoding = args.encoding
 
 
+
     phrases = list()
 
 
@@ -145,12 +146,34 @@ if __name__ == "__main__":
     utilities = Utilities()
     filtered_file_list = utilities.filter_files(raw_file_list)
     final_file_list = [utilities.append_uri(cloud_store_uri, file) for file in filtered_file_list]
-    logging.info(f'FILE LIST FOR PROCESSING: {final_file_list}')
+    string = f'FILE LIST FOR PROCESSING: {final_file_list}'
+    logging.info(string)
+
+    confirm = input('{string} \n\nProcess the above files (Y/N)?')
+    if confirm.lower() == 'n':
+        sys.exit(0)
+
 
     # Write queue file if it does not exist
     if not os.path.isfile('queue.txt'):
         audio_set = utilities.get_audio_set(final_file_list)
         io_handler.write_queue_file(audio_set)
+    else:
+        delete_queue = ('Queue file found, continue aborted run (Y/N).  Choosing N will delete existing queue file')
+        if delete_queue:
+            os.remove('queue.txt')
+
+    confirm = input(f'models: {models}, enhanced: {enhance}, language: {language_codes}, \n '
+                    f'alts: {alternative_language_codes} encoding: {encoding}, speech context: {bool(phrases)}, boosts: {boosts} + \n'
+                    f'expand numbers to words: {nlp_model.get_n2w()} \n'
+                    f'remove stop words: {nlp_model.get_remove_stop_words()} \n'
+                    f'expand contractions: {nlp_model.expand_contractions} \n'
+                    f'apply stemming: {nlp_model.get_apply_stemming()} \n\n'
+                    'Y/N:')
+    if not confirm.lower() == 'y':
+        sys.exit()
+
+
     # Read queue
     print('READ: queue.txt')
     queue_string = io_handler.read_queue_file()

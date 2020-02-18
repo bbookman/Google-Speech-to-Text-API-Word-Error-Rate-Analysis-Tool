@@ -172,7 +172,7 @@ class Utilities():
             result+=f'_alts_applied'
         if configuration.get_speech_context():
             result+=f'_speech_adaptation_applied'
-            result+= f'_boost_{configuration._get_boost()}'
+            result+= f'_boost_{configuration.get_boost()}'
         if nlp_model.get_remove_stop_words():
             result+='_stop_words_removed'
         if nlp_model.get_apply_stemming():
