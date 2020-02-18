@@ -78,6 +78,7 @@ if __name__ == "__main__":
 
     phrases = list()
 
+
     #
     #   Audit phrase file
     #
@@ -172,7 +173,7 @@ if __name__ == "__main__":
 
                     # Each enhancement option
                     for use_enhanced in enhanced_runs:
-                        for run in phrase_runs:
+                        for run in speech_context_runs:
                             configuration = Configuration()
                             configuration.set_use_enhanced(use_enhanced)
                             if run:
