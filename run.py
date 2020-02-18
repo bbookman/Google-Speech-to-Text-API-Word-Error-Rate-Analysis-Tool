@@ -144,7 +144,7 @@ if __name__ == "__main__":
     utilities = Utilities()
     filtered_file_list = utilities.filter_files(raw_file_list)
     final_file_list = [utilities.append_uri(cloud_store_uri, file) for file in filtered_file_list]
-    logging.info(f'FILE LIST FOR PROCESSING:' {final_file_list})
+    logging.info(f'FILE LIST FOR PROCESSING: {final_file_list}')
 
     # Write queue file if it does not exist
     if not os.path.isfile('queue.txt'):
