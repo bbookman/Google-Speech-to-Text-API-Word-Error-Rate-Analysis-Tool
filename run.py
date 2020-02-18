@@ -198,6 +198,7 @@ if __name__ == "__main__":
                             msg = f'READING: Reference file {cloud_store_uri}/{root}.txt'
                             print(msg)
                             logging.info(msg)
+
                             ref = gcs.read_ref(cloud_store_uri, root + '.txt')
 
                             # Generate hyp
