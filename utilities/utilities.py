@@ -170,7 +170,7 @@ class Utilities():
             result+= f'_enhanced'
         if configuration.get_alternative_language_codes():
             result+=f'_alts_applied'
-        if configuration.get_speech_context():
+        if configuration.get_speech_context() and configuration.get_boost():
             result+=f'_speech_adaptation_applied'
             result+= f'_boost_{configuration.get_boost()}'
         if nlp_model.get_remove_stop_words():
