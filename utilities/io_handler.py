@@ -32,14 +32,7 @@ class IOHandler(object):
                     print(f'Can not find csv file: {x}')
             self._csv_header_written = True
 
-    def update_csv(self,
-                   uri,
-                    configuration,
-                    nlp_model,
-                    ref_total_word_count = 0,
-                    ref_error_count = 0,
-                    word_error_rate =0,
-                    ):
+    def update_csv(self, uri, configuration, nlp_model, ref_total_word_count = 0, ref_error_count = 0, word_error_rate =0):
 
         full_path = f'{self.get_result_path()}/{self._result_file_name}'
         string = f'{uri}, {configuration.get_model()}, {configuration.get_use_enhanced()}, {configuration.get_language_code()},' \

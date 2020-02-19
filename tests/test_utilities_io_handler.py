@@ -54,22 +54,6 @@ def test_header_written_once():
     os.remove(file_path)
     assert result == expected
 
-
-
-def test_write_csv_verify_header():
-    from utilities.io_handler import IOHandler
-    import os, csv
-    io = IOHandler()
-    result_file_name = io._result_file_name
-    io.set_result_path('test_results_path')
-    io.write_csv_header()
-    full_path = f'{io.get_result_path()}/{result_file_name}'
-    expected_header_words = io._csv_header.split()
-    with open(full_path, 'r') as file:
-        result_header_words = csv.reader(file)
-
-    os.remove(full_path)
-
 def test_update_csv():
     from utilities.io_handler import IOHandler
     from model.configuration import Configuration
@@ -77,19 +61,14 @@ def test_update_csv():
     import os
     configuration = Configuration()
     nlp_model = NLPModel()
-
-    configuration.set_language_code()
-
     io = IOHandler()
     result_file_name = io._result_file_name
     io.set_result_path('test_results_path')
     io.write_csv_header()
     expected_uri = 'gs://foo/bar/baz/test.flac'
     expected_lang = 'fr-FR'
-    expected_boost = '341'
 
     configuration.set_language_code(expected_lang)
-    configuration._set_boost(expected_boost)
     io.update_csv(expected_uri, configuration, nlp_model)
     full_path = f'{io.get_result_path()}/{result_file_name}'
 
@@ -97,8 +76,63 @@ def test_update_csv():
         contents = file.read()
         os.remove(full_path)
         assert expected_uri in contents
-        assert expected_boost in contents
         assert expected_lang in contents
+        assert 'True' in contents
+
+
+def test_write_queue_file():
+    from utilities.io_handler import IOHandler
+    import os
+    io = IOHandler()
+    txt = 'this_root_audio_file_name, 122345, foobarbaz'
+    queue_path = 'queue.txt'
+    io.write_queue_file(txt)
+    expected = True
+    result = os.path.isfile(queue_path)
+    os.remove(queue_path)
+    assert result == expected
+
+
+def test_write_read_queue1():
+    from utilities.io_handler import IOHandler
+    import os
+    io = IOHandler()
+    file = 'queue.txt'
+    io.write_queue_file('')
+    expected = True
+    result = os.path.isfile(file)
+    os.path.isfile(file)
+    assert result == expected
+
+
+def test_write_read_queue2():
+    from utilities.io_handler import IOHandler
+    import os
+    io = IOHandler()
+    file = 'queue.txt'
+    expected = 'root,roll,rock'
+    io.write_queue_file(expected)
+    result = io.read_queue_file()
+    os.remove(file)
+    assert result == expected + ','
+
+
+def test_write_hyp():
+    from utilities.io_handler import IOHandler
+    import os
+    io = IOHandler()
+    result_path = 'test_results_path'
+    io.set_result_path(result_path)
+    file_name = '1234_en_US_phone_call_enhanced.txt'
+    expected_text = 'testing 1 2 3'
+    io.write_hyp(file_name, expected_text)
+    result = os.path.isfile(f'{result_path}/{file_name}')
+    expected = True
+    assert result == expected
+    with open(f'{result_path}/{file_name}', 'r') as f:
+        result_text = f.read()
+    assert result_text == expected_text
+
 
 
 
@@ -130,60 +164,3 @@ def DO_NOT_TST_html_diagnostic_contents():
                     continue
             assert passed == True
     os.remove(file_path)
-
-def test_write_queue_file():
-    from utilities.io_handler import IOHandler
-    import os
-    io = IOHandler()
-    txt = 'this_root_audio_file_name, 122345, foobarbaz'
-    queue_path = 'queue.txt'
-    io.write_queue_file(txt)
-    expected = True
-    result = os.path.isfile(queue_path)
-    os.remove(queue_path)
-    assert result == expected
-
-
-def test_read_queue_file():
-    from utilities.io_handler import IOHandler
-    io = IOHandler()
-    io.read_queue_file()
-
-def test_write_read_queue():
-    from utilities.io_handler import IOHandler
-    import os
-    io = IOHandler()
-    file = 'queue.txt'
-    io.write_queue_file('')
-    expected = True
-    result = os.path.isfile(file)
-    os.path.isfile(file)
-    assert result == expected
-
-
-def test_write_read_queue():
-    from utilities.io_handler import IOHandler
-    import os
-    io = IOHandler()
-    file = 'queue.txt'
-    expected = 'root,roll,rock,'
-    io.write_queue_file(expected)
-    result = io.read_queue_file()
-    os.remove(file)
-    assert result == expected
-
-
-def test_write_hyp():
-    from utilities.io_handler import IOHandler
-    import os
-    io = IOHandler()
-    result_path = 'test_results_path'
-    file_name = '1234_en_US_phone_call_enhanced.txt'
-    expected_text = 'testing 1 2 3'
-    io.write_hyp(file_name, expected_text)
-    result = os.path.isfile(f'{result_path}/{file_name}')
-    expected = True
-    assert result == expected
-    with open(f'{result_path}/{file_name}', 'r') as f:
-        result_text = f.read()
-    assert result_text == expected_text
