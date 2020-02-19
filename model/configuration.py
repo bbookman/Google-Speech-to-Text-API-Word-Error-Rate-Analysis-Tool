@@ -95,6 +95,6 @@ class Configuration(object):
 
         speech_context = self.get_speech_context()
         if self._get_phrases():
-            string += f'phrases: {bool(self._get_phrases())}, boost: {self._get_boost()}'
+            string += f'phrases: {bool(self._get_phrases())}, boost: {self.get_boost()}'
         return string
 
