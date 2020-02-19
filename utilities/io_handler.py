@@ -40,10 +40,9 @@ class IOHandler(object):
                     ref_error_count = 0,
                     word_error_rate =0,
                     ):
-        #  REF_WORD_COUNT, REF_ERROR_COUNT , WER,STEMMING_APPLIED , STOP_WORDS_REMOVED, NUMBER_TO_WORD_CONVERSION, CONTRACTIONS_EXPANDED\n'
         full_path = f'{self.get_result_path()}/{self._result_file_name}'
         string = f'{uri}, {configuration.get_model()}, {configuration.get_use_enhanced()}, {configuration.get_language_code()},' \
-                 f' {configuration.get_alternative_language_codes()}, {bool(configuration.get_speech_context()) and configuration.get_boost()},' \
+                 f' bool({configuration.get_alternative_language_codes()}), {bool(configuration.get_speech_context()) and configuration.get_boost()},' \
                  f'{configuration.get_boost()}, {ref_total_word_count}, {ref_error_count}, {word_error_rate}, {nlp_model.get_apply_stemming()},' \
                  f'{nlp_model.get_remove_stop_words()}, {nlp_model.get_n2w()}, {nlp_model.get_expand_contractions()}\n'
         with open(full_path, 'a+',) as file:
