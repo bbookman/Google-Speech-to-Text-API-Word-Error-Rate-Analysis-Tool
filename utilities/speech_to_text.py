@@ -1,6 +1,10 @@
 from model.configuration import Configuration
 from google.cloud import speech_v1p1beta1 as speech
-from google.cloud.speech_v1p1beta1 import types
+import logging
+
+# logging setup
+logging.basicConfig(filename='wer_app.log', level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 class SpeechToText(object):
     configuration = Configuration()
@@ -40,6 +44,6 @@ class SpeechToText(object):
             # First alternative is the most probable result
             transcript += " " + result.alternatives[0].transcript
         if not transcript:
-            raise BaseException("No transcript returned")
+            logger.debug('No transcript returned')
 
         return transcript
