@@ -52,6 +52,7 @@ if __name__ == "__main__":
                         help=('Space separated list of boost values to evaluate for speech adaptation'))
     parser.add_argument('-ch', '--multi', required=False, type=int,
                         help='Integer indicating the number of channels if more than one')
+    parser.add_argument('-a', '--alts2prime', required=False, action='store_true', help='Use each alternative language as a primary language')
 
     nlp_model = NLPModel()
     io_handler = IOHandler()
@@ -74,8 +75,13 @@ if __name__ == "__main__":
     boosts.append(0)
     alternative_language_codes = args.alternative_languages
     encoding = args.encoding
+    a2p = args.alts2prime
 
-
+    # if a2p, append the alts to the language list
+    if a2p:
+        for code in alternative_language_codes:
+            if code not in language_codes:
+                language_codes.append(code)
 
     phrases = list()
 
@@ -177,16 +183,17 @@ if __name__ == "__main__":
 
     confirm = input(f'models: {models} \n'
                     f'enhanced: {enhance}\n'
-                    f'language: {language_codes} \n'
-                    f'alternative language codes: {alternative_language_codes} \n'
+                    f'language: {language_codes}\n'
+                    f'alternative language codes: {alternative_language_codes}\n'
+                    f'use alternative language codes as primary: {a2p}\n'
                     f'encoding: {encoding}\n'
                     f'sample rate: {sample_rate_hertz}\n'
-                    f'speech context: {bool(phrases)}, boosts: {boosts} \n'
-                    f'expand numbers to words: {nlp_model.get_n2w()} \n'
-                    f'remove stop words: {nlp_model.get_remove_stop_words()} \n'
-                    f'expand contractions: {nlp_model.expand_contractions} \n'
                     f'audio channels: {audio_channel_count}\n'
-                    f'apply stemming: {nlp_model.get_apply_stemming()} \n\n'
+                    f'speech context: {bool(phrases)}, boosts: {boosts}\n'
+                    f'expand numbers to words: {nlp_model.get_n2w()}\n'
+                    f'remove stop words: {nlp_model.get_remove_stop_words()}\n'
+                    f'expand contractions: {nlp_model.expand_contractions}\n'
+                    f'apply stemming: {nlp_model.get_apply_stemming()}\n\n'
                     'All settings correct (Y/N)? ')
     if not confirm.lower() == 'y':
         sys.exit()
@@ -255,7 +262,8 @@ if __name__ == "__main__":
                             # Calculate WER
                             wer_obj = SimpleWER()
                             wer_obj.AddHypRef(hyp, ref)
-                            wer , ref_word_count, ref_error_count = wer_obj.GetWER()
+                         
+                            wer , ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
                             string = f'STATS: wer = {wer}, ref words = {ref_word_count}, number of errors = {ref_error_count}'
                             print(string)
                             logging.info(string)
