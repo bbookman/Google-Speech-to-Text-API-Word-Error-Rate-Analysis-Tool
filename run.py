@@ -1,5 +1,5 @@
 import argparse
-import os
+import os, sys
 import warnings
 from utilities.utilities import Utilities
 from utilities.cloud_storage import GCS
@@ -76,6 +76,7 @@ if __name__ == "__main__":
     encoding = args.encoding
 
 
+
     phrases = list()
 
 
@@ -145,12 +146,54 @@ if __name__ == "__main__":
     utilities = Utilities()
     filtered_file_list = utilities.filter_files(raw_file_list)
     final_file_list = [utilities.append_uri(cloud_store_uri, file) for file in filtered_file_list]
+
     logging.info(f'FILE LIST FOR PROCESSING: {final_file_list}')
 
-    # Write queue file if it does not exist
-    if not os.path.isfile('queue.txt'):
-        audio_set = utilities.get_audio_set(final_file_list)
-        io_handler.write_queue_file(audio_set)
+    for item in final_file_list:
+        print(item)
+    confirm = input('\n\nProcess the above files (Y/N)? ')
+    if confirm.lower() == 'n':
+        if os.path.isfile('queue.txt'):
+            print('Removing existing queue file')
+            os.remove('queue.txt')
+        sys.exit(0)
+    else:
+        print()
+        print()
+
+    # if queue file exists, give user option to continue last run
+    delete_queue = False
+    if os.path.isfile('queue.txt'):
+        delete_queue = input(
+            'Queue file found, continue aborted run (Y/N).  Choosing N will delete existing queue file: ')
+        if delete_queue:
+            os.remove('queue.txt')
+            print('DELETED: Existing queue.txt')
+
+
+    audio_set = utilities.get_audio_set(final_file_list)
+    io_handler.write_queue_file(audio_set)
+    print('WRITE: queue.txt\n')
+
+    confirm = input(f'models: {models} \n'
+                    f'enhanced: {enhance}\n'
+                    f'language: {language_codes} \n'
+                    f'alternative language codes: {alternative_language_codes} \n'
+                    f'encoding: {encoding}\n'
+                    f'sample rate: {sample_rate_hertz}\n'
+                    f'speech context: {bool(phrases)}, boosts: {boosts} \n'
+                    f'expand numbers to words: {nlp_model.get_n2w()} \n'
+                    f'remove stop words: {nlp_model.get_remove_stop_words()} \n'
+                    f'expand contractions: {nlp_model.expand_contractions} \n'
+                    f'audio channels: {audio_channel_count}\n'
+                    f'apply stemming: {nlp_model.get_apply_stemming()} \n\n'
+                    'All settings correct (Y/N)? ')
+    if not confirm.lower() == 'y':
+        sys.exit()
+    else:
+        print()
+        print()
+
     # Read queue
     print('READ: queue.txt')
     queue_string = io_handler.read_queue_file()
@@ -205,7 +248,7 @@ if __name__ == "__main__":
                             speech_to_text = SpeechToText()
                             hyp = speech_to_text.get_hypothesis(audio, configuration)
 
-                            unique_root = utilities.create_unique_root(root, configuration)
+                            unique_root = utilities.create_unique_root(root, configuration, nlp_model)
                             io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
 
 
@@ -226,33 +269,35 @@ if __name__ == "__main__":
                                                   ref_word_count, ref_error_count, wer)
 
                             io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
+                            if nlp_model.get_apply_stemming() or nlp_model.get_remove_stop_words() or nlp_model.get_n2w() or nlp_model.get_expand_contractions():
+                                # Get NLP results
+                                nlp_result = nlp_options.apply_nlp_options(nlp_model, hyp)
 
-                            # Get NLP results
-                            nlp_result = nlp_options.apply_nlp_options(nlp_model, hyp)
+                                # Get WER
+                                wer_obj.AddHypRef(nlp_result, ref)
+                                wer, ref_word_count, ref_error_count = wer_obj.GetWER()
+                                string = f'stop: {nlp_model.get_remove_stop_words()}, stem: {nlp_model.get_apply_stemming()}, n2w: {nlp_model.get_n2w()}, exp: {nlp_model.get_expand_contractions()}'
+                                print(string)
+                                logging.info(string)
+                                string = f'STATS: wer = {wer}, ref words = {ref_word_count}, number of errors = {ref_error_count}'
+                                print(string)
+                                logging.info(string)
 
-                            # Get WER
-                            wer_obj.AddHypRef(nlp_result, ref)
-                            wer, ref_word_count, ref_error_count = wer_obj.GetWER()
-                            string = f'stop: {nlp_model.get_remove_stop_words()}, stem: {nlp_model.get_apply_stemming()}, n2w: {nlp_model.get_n2w()}, exp: {nlp_model.get_expand_contractions()}'
-                            print(string)
-                            logging.info(string)
-                            string = f'STATS: wer = {wer}, ref words = {ref_word_count}, number of errors = {ref_error_count}'
-                            print(string)
-                            logging.info(string)
+                                # Write hyp
+                                unique_root = utilities.create_unique_root(root, configuration, nlp_model)
+                                io_handler.write_hyp(file_name=unique_root + '.txt', text=nlp_result)
 
-                            # Write hyp
-                            unique_root = utilities.create_unique_root(root, configuration, nlp_model)
-                            io_handler.write_hyp(file_name=unique_root + '.txt', text=nlp_result)
+                                # Write diagnostic
 
-                            # Write diagnostic
+                                io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
 
-                            io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
-
-                            # Update csv
-                            io_handler.update_csv(cloud_store_uri, configuration, nlp_model,
+                                # Update csv
+                                io_handler.update_csv(cloud_store_uri, configuration, nlp_model,
                                                   ref_word_count, ref_error_count, wer)
 
     print('Done')
+    print('Deleting queue')
+    os.remove('queue.txt')
 
 
 
