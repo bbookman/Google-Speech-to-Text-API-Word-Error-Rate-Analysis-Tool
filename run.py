@@ -266,7 +266,7 @@ if __name__ == "__main__":
                             # Write results
                             io_handler.write_csv_header()
                             io_handler.update_csv(cloud_store_uri, configuration, nlp_model,
-                                                  ref_word_count, ref_error_count, wer)
+                                                  ref_word_count, ref_error_count, wer, ins, deletions, subs )
 
                             io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
                             if nlp_model.get_apply_stemming() or nlp_model.get_remove_stop_words() or nlp_model.get_n2w() or nlp_model.get_expand_contractions():
@@ -275,7 +275,8 @@ if __name__ == "__main__":
 
                                 # Get WER
                                 wer_obj.AddHypRef(nlp_result, ref)
-                                wer, ref_word_count, ref_error_count = wer_obj.GetWER()
+                                # return round(wer, 2), nref, total_error, self.wer_info['ins'], self.wer_info['del'], self.wer_info['sub']
+                                wer, ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
                                 string = f'stop: {nlp_model.get_remove_stop_words()}, stem: {nlp_model.get_apply_stemming()}, n2w: {nlp_model.get_n2w()}, exp: {nlp_model.get_expand_contractions()}'
                                 print(string)
                                 logging.info(string)

@@ -330,7 +330,7 @@ class SimpleWER(object):
     total_error = self.wer_info['ins'] \
         + self.wer_info['del'] + self.wer_info['sub']
     wer = total_error * 100.0 / nref
-    return round(wer, 2), nref, total_error
+    return round(wer, 2), nref, total_error, self.wer_info['ins'], self.wer_info['del'], self.wer_info['sub']
 
   def GetKeyPhraseStats(self):
     """Measure the Jaccard similarity of key phrases between hyps and refs.
@@ -380,35 +380,3 @@ class SimpleWER(object):
 
     return str_sum, str_details, str_keyphrases_info
 
-
-def main(argv):
-  hypothesis = open(argv[1], 'r').read()
-  reference = open(argv[2], 'r').read()
-
-  if len(argv) == 4:
-    phrase_lines = open(argv[3]).readlines()
-    keyphrases = [line.strip() for line in phrase_lines]
-  else:
-    keyphrases = None
-
-  wer_obj = SimpleWER(
-      key_phrases=keyphrases,
-      html_handler=HighlightAlignedHtml,
-      preprocess_handler=RemoveCommentTxtPreprocess)
-
-  wer_obj.AddHypRef(hypothesis, reference)
-
-  str_summary, str_details, str_keyphrases_info = wer_obj.GetSummaries()
-  print(str_summary)
-  print(str_details)
-  print(str_keyphrases_info)
-
-  try:
-    fn_output = argv[1] + '_diagnosis.html'
-    aligned_html = '<br>'.join(wer_obj.aligned_htmls)
-    with open(fn_output, 'wt') as fp:
-      fp.write('<body><html>')
-      fp.write('<div>%s</div>' % aligned_html)
-      fp.write('</body></html>')
-  except IOError:
-    print('failed to write diagnosis html')

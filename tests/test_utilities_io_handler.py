@@ -67,7 +67,7 @@ def test_update_csv():
     io.write_csv_header()
     expected_uri = 'gs://foo/bar/baz/test.flac'
     expected_lang = 'fr-FR'
-
+    nlp_model.set_apply_stemming(True)
     configuration.set_language_code(expected_lang)
     io.update_csv(expected_uri, configuration, nlp_model)
     full_path = f'{io.get_result_path()}/{result_file_name}'
@@ -132,35 +132,3 @@ def test_write_hyp():
     with open(f'{result_path}/{file_name}', 'r') as f:
         result_text = f.read()
     assert result_text == expected_text
-
-
-
-
-def DO_NOT_TST_html_diagnostic_contents():
-    from utilities.io_handler import IOHandler
-    from utilities.utilities import Utilities
-    import os
-    hypothesis = 'this is a hyp'
-    reference = 'this is a ref'
-    html = 'this is a <span style="background-color: greenyellow"><del>hyp</del></span><span style="background-color: yellow">ref </span>'
-    expected = html.split()
-    u = Utilities()
-    io = IOHandler()
-    audio_uri = 'gs://foo/bar/baz/test.flac'
-    results_path = 'test_results_path'
-    io.set_result_path(results_path)
-    expected_file_name = u.get_root_filename(audio_uri) + '.html'
-
-    io.write_html_diagnostic(hypothesis, reference, audio_uri, results_path)
-    file_path = f'{results_path}/{expected_file_name}'
-    with open(file_path, 'r') as f:
-        reader = f.read()
-        results = reader.split()
-        for result in results:
-            passed = False
-            for item in expected:
-                if result in item:
-                    passed = True
-                    continue
-            assert passed == True
-    os.remove(file_path)
