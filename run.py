@@ -276,6 +276,18 @@ if __name__ == "__main__":
 
                             # Get words producing errors
                             inserted_words, deleted_words, substituted_words = wer_obj.GetMissedWords()
+
+                            ###
+                            #       debug
+                            #
+                            ###
+
+                            print(f'inserted words: {inserted_words}')
+                            print(f'deleted words: {deleted_words}')
+                            print(f'sub words: {substituted_words}')
+
+                            ###########
+
                             # Get counts
                             delete_word_counts = utilities.get_count_of_word_instances(deleted_words)
                             inserted_word_counts = utilities.get_count_of_word_instances(inserted_words)
