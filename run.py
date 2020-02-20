@@ -58,6 +58,7 @@ if __name__ == "__main__":
                         help='Integer indicating the number of channels if more than one')
     parser.add_argument('-a', '--alts2prime', default=False, required=False, action='store_true', help='Use each alternative language as a primary language')
     parser.add_argument('-q', '--random_queue', default=False, required=False, action='store_true', help='Replaces default queue.txt with randomly named queue file')
+    parser.add_argument('-fake', '--fake_hyp', default=False, required=False, action='store_true', help='Use a fake hypothesis for testing')
 
     nlp_model = NLPModel()
     io_handler = IOHandler()
@@ -82,6 +83,7 @@ if __name__ == "__main__":
     encoding = args.encoding
     a2p = args.alts2prime
     random_queue = args.random_queue
+    use_fake_hyp = args.fake_hyp
 
     # if a2p, append the alts to the language list
     if a2p:
@@ -290,7 +292,10 @@ if __name__ == "__main__":
 
                             # Generate hyp
                             speech_to_text = SpeechToText()
-                            hyp = speech_to_text.get_hypothesis(audio, configuration)
+                            if use_fake_hyp:
+                                hyp = 'this is a fake hyp'
+                            else:
+                                hyp = speech_to_text.get_hypothesis(audio, configuration)
 
                             unique_root = utilities.create_unique_root(root, configuration, nlp_model)
                             io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
