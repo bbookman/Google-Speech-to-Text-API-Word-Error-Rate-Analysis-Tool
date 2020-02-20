@@ -247,3 +247,9 @@ def test_create_unique_root_2():
     result = u.create_unique_root(root, configuration, nlp_model)
     expected = '12345_video_fr_FR_alts_applied_speech_adaptation_applied_boost_5_stop_words_removed_contractions_expanded_numbers_converted_2_words'
     assert result == expected
+
+def test_create_unique_queue_file_name():
+    from utilities.utilities import Utilities
+    u = Utilities()
+    result = u.create_unique_queue_file_name()
+    assert 'queue' in result

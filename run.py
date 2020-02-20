@@ -56,8 +56,8 @@ if __name__ == "__main__":
                         help=('Space separated list of boost values to evaluate for speech adaptation'))
     parser.add_argument('-ch', '--multi', required=False, type=int,
                         help='Integer indicating the number of channels if more than one')
-    parser.add_argument('-a', '--alts2prime', required=False, action='store_true', help='Use each alternative language as a primary language')
-
+    parser.add_argument('-a', '--alts2prime', default=False, required=False, action='store_true', help='Use each alternative language as a primary language')
+    parser.add_argument('-q', '--random_queue', default=False, required=False, action='store_true', help='Replaces default queue.txt with randomly named queue file')
 
     nlp_model = NLPModel()
     io_handler = IOHandler()
@@ -81,6 +81,7 @@ if __name__ == "__main__":
     alternative_language_codes = args.alternative_languages
     encoding = args.encoding
     a2p = args.alts2prime
+    random_queue = args.random_queue
 
     # if a2p, append the alts to the language list
     if a2p:
@@ -89,8 +90,6 @@ if __name__ == "__main__":
                 language_codes.append(code)
 
     phrases = list()
-
-
     #
     #   Audit phrase file
     #
@@ -160,31 +159,32 @@ if __name__ == "__main__":
 
     logger.info(f'FILE LIST FOR PROCESSING: {final_file_list}')
 
+    # Prompt for confirmation
     for item in final_file_list:
         print(item)
     confirm = input('\n\nProcess the above files (Y/N)? ')
     if confirm.lower() == 'n':
-        if os.path.isfile('queue.txt'):
-            print('Removing existing queue file')
-            os.remove('queue.txt')
         sys.exit(0)
     else:
         print()
-        print()
 
     # if queue file exists, give user option to continue last run
-    delete_queue = False
-    if os.path.isfile('queue.txt'):
-        delete_queue = input(
-            'Queue file found, continue aborted run (Y/N).  Choosing N will delete existing queue file: ')
-        if delete_queue:
-            os.remove('queue.txt')
-            print('DELETED: Existing queue.txt')
-
+    queue_file_name = io_handler.get_queue_file_name()
+    if not random_queue:
+        delete_queue = False
+        if os.path.isfile(queue_file_name):
+            delete_queue = input(
+                'Queue file found, continue aborted run (Y/N).  Choosing N will delete existing queue file: ')
+            if delete_queue:
+                os.remove(queue_file_name)
+                print('DELETED: Existing queue.txt')
+    else:
+        queue_file_name = utilities.create_unique_queue_file_name()
+        io_handler.set_queue_file_name(queue_file_name)
 
     audio_set = utilities.get_audio_set(final_file_list)
     io_handler.write_queue_file(audio_set)
-    print('WRITE: queue.txt\n')
+    print(f'WRITE: {queue_file_name}\n')
 
     confirm = input(f'models: {models} \n'
                     f'enhanced: {enhance}\n'
@@ -207,7 +207,7 @@ if __name__ == "__main__":
         print()
 
     # Read queue
-    print('READ: queue.txt')
+    print(f'READ: {queue_file_name}')
     queue_string = io_handler.read_queue_file()
     queue = queue_string.split(',')
     queue.remove('')
@@ -350,7 +350,7 @@ if __name__ == "__main__":
 
     print('Done')
     print('Deleting queue')
-    os.remove('queue.txt')
+    os.remove(queue_file_name)
 
 
 

@@ -8,6 +8,13 @@ class IOHandler(object):
     _csv_header_written = False
     configuration = Configuration()
     nlp_model = NLPModel()
+    _queue_file_name = 'queue.txt'
+
+    def set_queue_file_name(self, name):
+        self._queue_file_name = name
+
+    def get_queue_file_name(self):
+        return self._queue_file_name
 
     def set_result_path(self, result_path):
         self._result_path = result_path
@@ -61,7 +68,7 @@ class IOHandler(object):
 
     def write_queue_file(self, data):
         try:
-            with open('queue.txt', 'a+') as f:
+            with open(self._queue_file_name, 'a+') as f:
                 if isinstance(data, str):
                     info = data.split()
                 else:
@@ -75,7 +82,7 @@ class IOHandler(object):
     def read_queue_file(self):
         result = None
         try:
-            with open('queue.txt', 'r') as f:
+            with open(self._queue_file_name, 'r') as f:
                 result = f.read()
         except IOError as e:
             print(f'Can not read queue file: {e}')
