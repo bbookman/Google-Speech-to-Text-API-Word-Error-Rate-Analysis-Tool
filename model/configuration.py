@@ -86,15 +86,12 @@ class Configuration(object):
                 f'language_code: {self.languageCode}, ' \
                 f'use_enhanced: {self.useEnhanced}, ' \
                 f'sample_rate: {self.sampleRateHertz}, ' \
-                f'encoding: {self.encoding}, '
+                f'encoding: {self.encoding}, ' \
+                f'phrases: {bool(self._get_phrases())}, boost: {self.get_boost()}'
 
         audio_channel_count = self.get_audio_channel_count()
         if audio_channel_count > 1:
             string += f'enable_sep_channel_rec: {self.enableSeparateRecognitionPerChannel}, ' \
-                      f'audio_channels: {self.audioChannelCount}, ' \
-
-        speech_context = self.get_speech_context()
-        if self._get_phrases():
-            string += f'phrases: {bool(self._get_phrases())}, boost: {self.get_boost()}'
+                      f'audio_channels: {self.audioChannelCount}, '
         return string
 
