@@ -120,6 +120,7 @@ def test_write_read_queue2():
 def test_write_hyp():
     from utilities.io_handler import IOHandler
     import os
+    import shutil
     io = IOHandler()
     result_path = 'test_results_path'
     io.set_result_path(result_path)
@@ -131,4 +132,9 @@ def test_write_hyp():
     assert result == expected
     with open(f'{result_path}/{file_name}', 'r') as f:
         result_text = f.read()
+
+    try:
+        shutil.rmtree('/Users/bookmanb/stt/stt_rewrite/tests/test_results_path')
+    except BaseException:
+        pass #do nothing
     assert result_text == expected_text
