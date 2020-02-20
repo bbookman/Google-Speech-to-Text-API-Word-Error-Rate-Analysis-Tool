@@ -183,3 +183,11 @@ class Utilities():
             result+= '_numbers_converted_2_words'
 
         return result
+
+    def create_unique_queue_file_name(self):
+        from random import seed
+        from random import randint
+        s = randint(0,100)
+        seed(s)
+        random_number = randint(1000, 9999)
+        return f'queue_{random_number}.txt'
