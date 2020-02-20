@@ -214,6 +214,7 @@ if __name__ == "__main__":
     logger.info(f'QUEUE: {queue}')
     # Process Audio
     for audio in queue:
+        boost_statement = False
         for model in models:
             for boost in boosts:
                 for language_code in language_codes:
@@ -240,10 +241,11 @@ if __name__ == "__main__":
                                     else:
                                         continue
 
-                                if boost > 0:
+                                if boost > 0 and not boost_statement:
                                     string = f'Boost: {boost} not supported for language: {language_code}. Skipping'
                                     print(string)
                                     logger.info(string)
+                                    boost_statement = True
                                     continue
 
                             # only run features that are supported for the model
