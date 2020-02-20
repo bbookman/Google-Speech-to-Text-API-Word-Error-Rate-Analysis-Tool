@@ -255,6 +255,7 @@ if __name__ == "__main__":
 
                             # Generate hyp
                             speech_to_text = SpeechToText()
+
                             hyp = speech_to_text.get_hypothesis(audio, configuration)
 
                             unique_root = utilities.create_unique_root(root, configuration, nlp_model)
