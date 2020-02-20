@@ -183,3 +183,13 @@ class Utilities():
             result+= '_numbers_converted_2_words'
 
         return result
+
+    def get_count_of_word_instances(self, word_list):
+        word_set = set(word_list)
+        result = dict()
+        for word in word_set:
+            count = word_list.count(word)
+            result[word] = count
+        return result
+
+

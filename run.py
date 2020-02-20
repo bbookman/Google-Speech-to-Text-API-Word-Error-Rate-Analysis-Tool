@@ -272,11 +272,15 @@ if __name__ == "__main__":
 
                             #Remove hyp/ref from WER
                             wer_obj.AddHypRef('', '')
-                            # self.words_inserted, self.words_deleted, self.words_substituted
+
+                            # Get words producing errors
                             inserted_words, deleted_words, substituted_words = wer_obj.GetMissedWords()
+                            # Get counts
+                            delete_word_counts = utilities.get_count_of_word_instances(deleted_words)
+                            inserted_word_counts = utilities.get_count_of_word_instances(inserted_words)
+                            substituted_word_count = utilities.get_count_of_word_instances(substituted_words)
 
-
-
+                            ############  TRY A TEST USING TEST_AUDIO_N_TRUTH
 
                             # Write results
                             io_handler.write_csv_header()
