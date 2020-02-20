@@ -266,13 +266,13 @@ class SimpleWER(object):
           err_type = 'none'  # correct error
         elif distmat[pos_ref][pos_hyp] == distmat[pos_ref - 1][pos_hyp - 1] + 1:
           err_type = 'sub'  # substitute error
-          self.words_substituted.append(hyp_words[pos_hyp])
+         # self.words_substituted.append(hyp_words[pos_hyp])
         elif distmat[pos_ref][pos_hyp] == distmat[pos_ref - 1][pos_hyp] + 1:
           err_type = 'del'  # deletion error
           words_deleted.append(ref_words[pos_ref])
         elif distmat[pos_ref][pos_hyp] == distmat[pos_ref][pos_hyp - 1] + 1:
           err_type = 'ins'  # insersion error
-          self.words_inserted.append(hyp_words[pos_hyp])
+          #self.words_inserted.append(hyp_words[pos_hyp])
         else:
           raise ValueError('fail to parse edit distance matrix.')
 
