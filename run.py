@@ -220,8 +220,6 @@ if __name__ == "__main__":
                     else:
                         enhanced_runs = [False]
 
-                    if phrases:
-                        phrase_runs = [False, True]
 
                     # Each enhancement option
                     for use_enhanced in enhanced_runs:
@@ -238,6 +236,8 @@ if __name__ == "__main__":
                             if audio_channel_count > 1:
                                 configuration.set_audio_channel_count(audio_channel_count)
                                 configuration.set_enable_separate_recognition_per_channel(True)
+
+
 
                             logger.info(f'CONFIGURATION: {configuration}')
                             print(f'STARTING')
@@ -272,6 +272,11 @@ if __name__ == "__main__":
 
                             #Remove hyp/ref from WER
                             wer_obj.AddHypRef('', '')
+                            # self.words_inserted, self.words_deleted, self.words_substituted
+                            inserted_words, deleted_words, substituted_words = wer_obj.GetMissedWords()
+
+
+
 
                             # Write results
                             io_handler.write_csv_header()
@@ -279,6 +284,8 @@ if __name__ == "__main__":
                                                   ref_word_count, ref_error_count, wer, ins, deletions, subs )
 
                             io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
+
+                            #NLP options
                             if nlp_model.get_apply_stemming() or nlp_model.get_remove_stop_words() or nlp_model.get_n2w() or nlp_model.get_expand_contractions():
                                 # Get NLP results
                                 nlp_result = nlp_options.apply_nlp_options(nlp_model, hyp)

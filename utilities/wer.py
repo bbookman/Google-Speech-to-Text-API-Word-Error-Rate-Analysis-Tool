@@ -205,6 +205,9 @@ class SimpleWER(object):
     self._html_handler = html_handler
     self.key_phrases = key_phrases
     self.aligned_htmls = []
+    self.words_deleted= list()
+    self.words_inserted = list()
+    self.words_substituted = list()
     self.wer_info = {'sub': 0, 'ins': 0, 'del': 0, 'nw': 0}
     if key_phrases:
       # Pre-process key_phrase list
@@ -235,6 +238,7 @@ class SimpleWER(object):
     Raises:
       ValueError: when the program fails to parse edit distance matrix.
     """
+
     if self._preprocess_handler:
       hypothesis = self._preprocess_handler(hypothesis)
       reference = self._preprocess_handler(reference)
@@ -262,10 +266,13 @@ class SimpleWER(object):
           err_type = 'none'  # correct error
         elif distmat[pos_ref][pos_hyp] == distmat[pos_ref - 1][pos_hyp - 1] + 1:
           err_type = 'sub'  # substitute error
+          self.words_substituted.append(hyp_words[pos_hyp])
         elif distmat[pos_ref][pos_hyp] == distmat[pos_ref - 1][pos_hyp] + 1:
           err_type = 'del'  # deletion error
+          words_deleted.append(ref_words[pos_ref])
         elif distmat[pos_ref][pos_hyp] == distmat[pos_ref][pos_hyp - 1] + 1:
           err_type = 'ins'  # insersion error
+          self.words_inserted.append(hyp_words[pos_hyp])
         else:
           raise ValueError('fail to parse edit distance matrix.')
 
@@ -380,3 +387,5 @@ class SimpleWER(object):
 
     return str_sum, str_details, str_keyphrases_info
 
+  def GetMissedWords(self):
+    return self.words_inserted, self.words_deleted, self.words_substituted
