@@ -33,13 +33,17 @@ class IOHandler(object):
             self._csv_header_written = True
 
     def update_csv(self, uri, configuration, nlp_model, word_count_list ,ref_total_word_count = 0, ref_error_count = 0, word_error_rate =0, ins=0, deletions=0, subs=0 ):
+        from collections import OrderedDict
+        deleted_words = OrderedDict(sorted(word_count_list[0].items(), key=lambda x: x[1]))
+        inserted_words = OrderedDict(sorted(word_count_list[1].items(), key=lambda x: x[1]))
+        substitute_words = OrderedDict(sorted(word_count_list[2].items(), key=lambda x: x[1]))
 
         full_path = f'{self.get_result_path()}/{self._result_file_name}'
         string = f'{uri}, {configuration.get_model()}, {configuration.get_use_enhanced()}, {configuration.get_language_code()},' \
                  f' bool({configuration.get_alternative_language_codes()}), {bool(configuration.get_speech_context()) and configuration.get_boost()},' \
                  f'{configuration.get_boost()}, {ref_total_word_count}, {ref_error_count}, {word_error_rate}, {nlp_model.get_apply_stemming()},' \
                  f'{nlp_model.get_remove_stop_words()}, {nlp_model.get_n2w()}, {nlp_model.get_expand_contractions()}, {ins}, {deletions}, {subs}' \
-                 f'{word_count_list[0]}, {word_count_list[1], word_count_list[2]}\n'
+                 f'{deleted_words}, {inserted_words}, {substitute_words}\n'
         with open(full_path, 'a+',) as file:
             try:
                 file.write(string)
