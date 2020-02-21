@@ -184,6 +184,7 @@ class Utilities():
 
         return result
 
+
     def create_unique_queue_file_name(self):
         from random import seed
         from random import randint
@@ -191,3 +192,14 @@ class Utilities():
         seed(s)
         random_number = randint(1000, 9999)
         return f'queue_{random_number}.txt'
+
+    def get_count_of_word_instances(self, word_list):
+        word_set = set(word_list)
+        result = dict()
+        for word in word_set:
+            count = word_list.count(word)
+            result[word] = count
+        return result
+
+
+

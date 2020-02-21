@@ -226,7 +226,6 @@ if __name__ == "__main__":
                     else:
                         enhanced_runs = [False]
 
-
                     # Each enhancement option
                     for use_enhanced in enhanced_runs:
                         for run in speech_context_runs:
@@ -274,8 +273,6 @@ if __name__ == "__main__":
                                 configuration.set_audio_channel_count(audio_channel_count)
                                 configuration.set_enable_separate_recognition_per_channel(True)
 
-
-
                             logger.info(f'CONFIGURATION: {configuration}')
                             print(f'STARTING')
                             msg = f'audio: {audio}, {configuration}'
@@ -292,10 +289,12 @@ if __name__ == "__main__":
 
                             # Generate hyp
                             speech_to_text = SpeechToText()
+
                             if use_fake_hyp:
                                 hyp = 'this is a fake hyp'
                             else:
                                 hyp = speech_to_text.get_hypothesis(audio, configuration)
+
 
                             unique_root = utilities.create_unique_root(root, configuration, nlp_model)
                             io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
@@ -312,15 +311,17 @@ if __name__ == "__main__":
 
                             #Remove hyp/ref from WER
                             wer_obj.AddHypRef('', '')
-                            # self.words_inserted, self.words_deleted, self.words_substituted
-                           # inserted_words, deleted_words, substituted_words = wer_obj.GetMissedWords()
 
+                            # Get words producing errors
+                            inserted_words, deleted_words, substituted_words = wer_obj.GetMissedWords()
 
+                            delete_word_counts = utilities.get_count_of_word_instances(deleted_words)
+                            inserted_word_counts = utilities.get_count_of_word_instances(inserted_words)
+                            substituted_word_count = utilities.get_count_of_word_instances(substituted_words)
+                            word_count_list = (delete_word_counts, inserted_word_counts,  substituted_word_count  )
 
-
-                            # Write results
                             io_handler.write_csv_header()
-                            io_handler.update_csv(cloud_store_uri, configuration, nlp_model,
+                            io_handler.update_csv(cloud_store_uri, configuration, nlp_model,  word_count_list ,
                                                   ref_word_count, ref_error_count, wer, ins, deletions, subs )
 
                             io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())

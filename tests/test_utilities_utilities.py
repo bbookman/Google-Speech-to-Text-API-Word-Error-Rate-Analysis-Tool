@@ -248,8 +248,18 @@ def test_create_unique_root_2():
     expected = '12345_video_fr_FR_alts_applied_speech_adaptation_applied_boost_5_stop_words_removed_contractions_expanded_numbers_converted_2_words'
     assert result == expected
 
+
 def test_create_unique_queue_file_name():
     from utilities.utilities import Utilities
     u = Utilities()
     result = u.create_unique_queue_file_name()
     assert 'queue' in result
+
+def test_get_count_of_word_instances():
+    from utilities.utilities import Utilities
+    u = Utilities()
+    word_list = ['hello', 'hi', 'hello', 'there', 'hello']
+    result = u.get_count_of_word_instances(word_list)
+    expected =  {'hello': 3, 'hi': 1, 'there': 1}
+    assert result == expected
+

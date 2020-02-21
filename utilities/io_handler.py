@@ -4,7 +4,7 @@ from model.nlp import NLPModel
 class IOHandler(object):
     _result_path = ''
     _result_file_name = 'results.csv'
-    _csv_header = 'AUDIO_FILE, MODEL, ENHANCED, LANGUAGE, ALTERNATIVE_LANGS, PHRASE_HINTS_APPLIED, BOOST, REF_WORD_COUNT, REF_ERROR_COUNT , WER,STEMMING_APPLIED , STOP_WORDS_REMOVED, NUMBER_TO_WORD_CONVERSION, CONTRACTIONS_EXPANDED, INSERTIONS, DELETIONS, SUBSTITUTIONS\n'
+    _csv_header = 'AUDIO_FILE, MODEL, ENHANCED, LANGUAGE, ALTERNATIVE_LANGS, PHRASE_HINTS_APPLIED, BOOST, REF_WORD_COUNT, REF_ERROR_COUNT , WER,STEMMING_APPLIED , STOP_WORDS_REMOVED, NUMBER_TO_WORD_CONVERSION, CONTRACTIONS_EXPANDED, INSERTIONS, DELETIONS, SUBSTITUTIONS, DELETED_WORDS, INSERTED_WORDS, SUBSTITUTE_WORDS\n'
     _csv_header_written = False
     configuration = Configuration()
     nlp_model = NLPModel()
@@ -39,13 +39,18 @@ class IOHandler(object):
                     print(f'Can not find csv file: {x}')
             self._csv_header_written = True
 
-    def update_csv(self, uri, configuration, nlp_model, ref_total_word_count = 0, ref_error_count = 0, word_error_rate =0, ins=0, deletions=0, subs=0 ):
+    def update_csv(self, uri, configuration, nlp_model, word_count_list ,ref_total_word_count = 0, ref_error_count = 0, word_error_rate =0, ins=0, deletions=0, subs=0 ):
+        from collections import OrderedDict
+        deleted_words = OrderedDict(sorted(word_count_list[0].items(), key=lambda x: x[1]))
+        inserted_words = OrderedDict(sorted(word_count_list[1].items(), key=lambda x: x[1]))
+        substitute_words = OrderedDict(sorted(word_count_list[2].items(), key=lambda x: x[1]))
 
         full_path = f'{self.get_result_path()}/{self._result_file_name}'
         string = f'{uri}, {configuration.get_model()}, {configuration.get_use_enhanced()}, {configuration.get_language_code()},' \
                  f' {bool(configuration.get_alternative_language_codes())}, {bool(configuration.get_speech_context()) and configuration.get_boost()},' \
                  f'{configuration.get_boost()}, {ref_total_word_count}, {ref_error_count}, {word_error_rate}, {nlp_model.get_apply_stemming()},' \
-                 f'{nlp_model.get_remove_stop_words()}, {nlp_model.get_n2w()}, {nlp_model.get_expand_contractions()}, {ins}, {deletions}, {subs}\n'
+                 f'{nlp_model.get_remove_stop_words()}, {nlp_model.get_n2w()}, {nlp_model.get_expand_contractions()}, {ins}, {deletions}, {subs}' \
+                 f'{deleted_words}, {inserted_words}, {substitute_words}\n'
         with open(full_path, 'a+',) as file:
             try:
                 file.write(string)
@@ -87,7 +92,7 @@ class IOHandler(object):
         except IOError as e:
             print(f'Can not read queue file: {e}')
         except FileNotFoundError as x:
-            print(f'Queue file not found: {f}')
+            print(f'Queue file not found: {x}')
         if not result:
             raise IOError('No contents found in queue')
         return result

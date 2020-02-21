@@ -266,10 +266,12 @@ class SimpleWER(object):
           err_type = 'none'  # correct error
         elif distmat[pos_ref][pos_hyp] == distmat[pos_ref - 1][pos_hyp - 1] + 1:
           err_type = 'sub'  # substitute error
-         # self.words_substituted.append(hyp_words[pos_hyp])
         elif distmat[pos_ref][pos_hyp] == distmat[pos_ref - 1][pos_hyp] + 1:
           err_type = 'del'  # deletion error
-          #self.words_deleted.append(ref_words[pos_ref])
+          self.words_substituted.append(hyp_words[pos_hyp -1])
+        elif distmat[pos_ref][pos_hyp] == distmat[pos_ref - 1][pos_hyp] + 1:
+          err_type = 'del'  # deletion error
+          self.words_deleted.append(ref_words[pos_ref])
         elif distmat[pos_ref][pos_hyp] == distmat[pos_ref][pos_hyp - 1] + 1:
           err_type = 'ins'  # insersion error
           #self.words_inserted.append(hyp_words[pos_hyp])
