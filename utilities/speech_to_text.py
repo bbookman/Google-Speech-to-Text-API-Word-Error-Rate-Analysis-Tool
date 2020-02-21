@@ -20,8 +20,10 @@ class SpeechToText(object):
             "language_code" : configuration.get_language_code(),
             "alternative_language_codes" : configuration.get_alternative_language_codes(),
             "audio_channel_count" : configuration.get_audio_channel_count(),
-            "enable_separate_recognition_per_channel" : configuration.get_enable_separate_recognition_per_channel()
-
+            "enable_separate_recognition_per_channel" : configuration.get_enable_separate_recognition_per_channel(),
+            "enable_speaker_diarization": configuration.get_enableSpeakerDiarization(),
+            "diarization_speaker_count": configuration.get_diarizationSpeakerCount(),
+            "enable_automatic_punctuation": configuration.get_enableAutomaticPunctuation()
         }
 
 

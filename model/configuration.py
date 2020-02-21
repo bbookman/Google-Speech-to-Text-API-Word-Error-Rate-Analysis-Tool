@@ -11,6 +11,25 @@ class Configuration(object):
     phrases = []
     speech_context_element = {"phrases": phrases, "boost": boost}
     speech_context = [speech_context_element]
+    enableAutomaticPunctuation = False
+    enableSpeakerDiarization = False
+    diarizationSpeakerCount = 0
+
+
+    def set_enableAutomaticPunctuation(self, setting):
+        self.enableAutomaticPunctuation = setting
+    def get_enableAutomaticPunctuation(self):
+        return self.enableAutomaticPunctuation
+
+    def set_enableSpeakerDiarization(self, setting):
+        self.enableSpeakerDiarization == setting
+
+    def get_enableSpeakerDiarization(self):
+        return self.enableSpeakerDiarization
+    def set_diarizationSpeakerCount(self, count):
+        self.diarizationSpeakerCount = count
+    def get_diarizationSpeakerCount(self):
+        return self.diarizationSpeakerCount
 
     def _set_boost(self, boost):
         self.boost = boost
@@ -87,7 +106,7 @@ class Configuration(object):
                 f'use_enhanced: {self.useEnhanced}, ' \
                 f'sample_rate: {self.sampleRateHertz}, ' \
                 f'encoding: {self.encoding}, ' \
-                f'phrases: {bool(self._get_phrases())}, boost: {self.get_boost()}'
+                f'phrases: {bool(self._get_phrases())}, boost:{self.get_boost()}'
 
         audio_channel_count = self.get_audio_channel_count()
         if audio_channel_count > 1:

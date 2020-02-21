@@ -63,6 +63,7 @@ if __name__ == "__main__":
     nlp_model = NLPModel()
     io_handler = IOHandler()
     nlp_options = NLPOptions()
+    configuration = Configuration()
     args = parser.parse_args()
     cloud_store_uri = args.cloud_store_uri
     io_handler.set_result_path(args.local_results_path)
@@ -158,6 +159,19 @@ if __name__ == "__main__":
     utilities = Utilities()
     filtered_file_list = utilities.filter_files(raw_file_list)
     final_file_list = [utilities.append_uri(cloud_store_uri, file) for file in filtered_file_list]
+
+    # if only doing transcriptions, add diarization and punctuation?
+    dia = False
+    punct = False
+    c = None
+    if only_transcribe:
+        dia = input('Add Diarization Y/N ')
+        c = input('How many speakers (int) ')
+        configuration.set_diarizationSpeakerCount(int(c))
+        configuration.set_enableSpeakerDiarization(bool(dia))
+        punct = input('Add Punctuation Y/N? ')
+        configuration.set_enableAutomaticPunctuation(bool(punct))
+
 
     logger.info(f'FILE LIST FOR PROCESSING: {final_file_list}')
 
@@ -258,9 +272,6 @@ if __name__ == "__main__":
                                 print(string)
                                 alternative_language_codes = []
 
-
-
-                            configuration = Configuration()
                             configuration.set_use_enhanced(use_enhanced)
                             if run:
                                 configuration.set_speech_context(phrases, boost)
