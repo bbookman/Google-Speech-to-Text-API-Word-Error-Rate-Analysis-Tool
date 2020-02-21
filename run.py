@@ -220,7 +220,6 @@ if __name__ == "__main__":
                     else:
                         enhanced_runs = [False]
 
-
                     # Each enhancement option
                     for use_enhanced in enhanced_runs:
                         for run in speech_context_runs:
@@ -236,8 +235,6 @@ if __name__ == "__main__":
                             if audio_channel_count > 1:
                                 configuration.set_audio_channel_count(audio_channel_count)
                                 configuration.set_enable_separate_recognition_per_channel(True)
-
-
 
                             logger.info(f'CONFIGURATION: {configuration}')
                             print(f'STARTING')
@@ -277,26 +274,13 @@ if __name__ == "__main__":
                             # Get words producing errors
                             inserted_words, deleted_words, substituted_words = wer_obj.GetMissedWords()
 
-                            ###
-                            #       debug
-                            #
-                            ###
-
-                            print(f'inserted words: {inserted_words}')
-                            print(f'deleted words: {deleted_words}')
-                            print(f'sub words: {substituted_words}')
-
-                            ###########
-
-                            # Get counts
                             delete_word_counts = utilities.get_count_of_word_instances(deleted_words)
                             inserted_word_counts = utilities.get_count_of_word_instances(inserted_words)
                             substituted_word_count = utilities.get_count_of_word_instances(substituted_words)
+                            word_count_list = (delete_word_counts, inserted_word_counts,  substituted_word_count  )
 
-
-                            # Write results
                             io_handler.write_csv_header()
-                            io_handler.update_csv(cloud_store_uri, configuration, nlp_model,
+                            io_handler.update_csv(cloud_store_uri, configuration, nlp_model,  word_count_list ,
                                                   ref_word_count, ref_error_count, wer, ins, deletions, subs )
 
                             io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
