@@ -79,6 +79,7 @@ if __name__ == "__main__":
     language_codes = args.langs
     phrase_file_path = args.phrase_file
     boosts = [int(i) for i in args.boosts]
+
     boosts.append(0)
     alternative_language_codes = args.alternative_languages
     encoding = args.encoding
@@ -248,38 +249,39 @@ if __name__ == "__main__":
                     else:
                         enhanced_runs = [False]
 
+                    # only run supported features by language
+                    if language_code not in 'en-US':
+                        if model in en_only:
+                            string = f'CURRENT LANGUAGE SELECTION: {language_code} is not supported for model {model}\n' \
+                                     f'REPLACING {model} with "default"'
+                            print(string)
+                            logger.info(string)
+                            if 'default' not in models:
+                                model = 'default'
+                            else:
+                                continue
+                        # audit boost
+                        if boost > 0:
+                            string = f'Boost: {boost} not supported for language: {language_code}. Skipping'
+                            print(string)
+                            logger.info(string)
+                            boost = 0
+                            continue
+
+                        # only run features that are supported for the model
+                        # alternative_language_codes
+                        if alternative_language_codes and model not in alt_support_models:
+                            string = f'CURRENT MODEL SELECTION: {model} does not support alternative automatic language detection\n' \
+                                     f'This feature will be turned off for this model'
+                            logger.info(string)
+                            print(string)
+                            alternative_language_codes = []
+
                     # Each enhancement option
                     for use_enhanced in enhanced_runs:
                         for run in speech_context_runs:
 
-                            # only run supported features by language
-                            if language_code not in 'en-US':
-                                if model in en_only:
-                                    string = f'CURRENT LANGUAGE SELECTION: {language_code} is not supported for model {model}\n' \
-                                             f'REPLACING {model} with "default"'
-                                    print(string)
-                                    logger.info(string)
-                                    if 'default' not in models:
-                                        model = 'default'
-                                    else:
-                                        continue
-                                # audit boost
-                                if boost > 0:
-                                    string = f'Boost: {boost} not supported for language: {language_code}. Skipping'
-                                    print(string)
-                                    logger.info(string)
-                                    boost = 0
-                                    continue
 
-
-                            # only run features that are supported for the model
-                            # alternative_language_codes
-                            if alternative_language_codes and model not in alt_support_models:
-                                string = f'CURRENT MODEL SELECTION: {model} does not support alternative automatic language detection\n' \
-                                        f'This feature will be turned off for this model'
-                                logger.info(string)
-                                print(string)
-                                alternative_language_codes = []
 
                             configuration.set_use_enhanced(use_enhanced)
 
