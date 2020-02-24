@@ -106,7 +106,7 @@ class Configuration(object):
                 f'use_enhanced: {self.useEnhanced}, ' \
                 f'sample_rate: {self.sampleRateHertz}, ' \
                 f'encoding: {self.encoding}, ' \
-                f'phrases: {bool(self._get_phrases())}, boost:{self.get_boost()}'
+                f'phrases: {bool(self._get_phrases())}, boost:{self.get_boost()}, '
 
         audio_channel_count = self.get_audio_channel_count()
         if audio_channel_count > 1:

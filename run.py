@@ -238,7 +238,7 @@ if __name__ == "__main__":
         logger.info(msg)
 
         ref = gcs.read_ref(cloud_store_uri, root + '.txt')
-        boost_statement = False
+
         for model in models:
             for boost in boosts:
                 for language_code in language_codes:
@@ -263,13 +263,14 @@ if __name__ == "__main__":
                                         model = 'default'
                                     else:
                                         continue
-
-                                if boost > 0 and not boost_statement:
+                                # audit boost
+                                if boost > 0:
                                     string = f'Boost: {boost} not supported for language: {language_code}. Skipping'
                                     print(string)
                                     logger.info(string)
-                                    boost_statement = True
+                                    boost = 0
                                     continue
+
 
                             # only run features that are supported for the model
                             # alternative_language_codes
