@@ -273,8 +273,11 @@ if __name__ == "__main__":
                                 alternative_language_codes = []
 
                             configuration.set_use_enhanced(use_enhanced)
+
+                            # for speech context inclusion / disclusion
                             if run:
                                 configuration.set_speech_context(phrases, boost)
+
                             configuration.set_alternative_language_codes(alternative_language_codes)
                             configuration.set_model(model)
                             configuration.set_sample_rate_hertz(sample_rate_hertz)
