@@ -228,8 +228,16 @@ if __name__ == "__main__":
     queue = queue_string.split(',')
     queue.remove('')
     logger.info(f'QUEUE: {queue}')
+
     # Process Audio
     for audio in queue:
+        # Read reference
+        root = utilities.get_root_filename(audio)
+        msg = f'READING: Reference file {cloud_store_uri}/{root}.txt'
+        print(msg)
+        logger.info(msg)
+
+        ref = gcs.read_ref(cloud_store_uri, root + '.txt')
         boost_statement = False
         for model in models:
             for boost in boosts:
@@ -293,13 +301,7 @@ if __name__ == "__main__":
                             logger.info(msg)
                             print(msg)
 
-                            # Read reference
-                            root = utilities.get_root_filename(audio)
-                            msg = f'READING: Reference file {cloud_store_uri}/{root}.txt'
-                            print(msg)
-                            logger.info(msg)
 
-                            ref = gcs.read_ref(cloud_store_uri, root + '.txt')
 
                             # Generate hyp
                             speech_to_text = SpeechToText()
