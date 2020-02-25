@@ -230,69 +230,65 @@ if __name__ == "__main__":
     queue.remove('')
     logger.info(f'QUEUE: {queue}')
 
-    # Process Audio
-    for audio in queue:
-        # Read reference
-        root = utilities.get_root_filename(audio)
-        msg = f'READING: Reference file {cloud_store_uri}/{root}.txt'
-        print(msg)
-        logger.info(msg)
 
-        ref = gcs.read_ref(cloud_store_uri, root + '.txt')
 
-        for model in models:
+    for model in models:
+        # only run features that are supported for the model
+        if alternative_language_codes and model not in alt_support_models:
+            string = f'CURRENT MODEL SELECTION: {model} does not support alternative automatic language detection\n' \
+                     f'This feature will be turned off for this model'
+            logger.info(string)
+            print(string)
+            alternative_language_codes = []
+
+        for language in language_codes:
+            # only run supported features by language
+            if language not in 'en-US':
+                if model in en_only:
+                    string = f'CURRENT LANGUAGE SELECTION: {language} is not supported for model {model}. Skipping\n'
+                    print(string)
+                    logger.info(string)
+                    continue
             for boost in boosts:
-                for language_code in language_codes:
-                    # Run enhanced option only for phone call model
-                    if enhance and model == 'phone_call':
-                        enhanced_runs = [True, False]
-                    else:
-                        enhanced_runs = [False]
+                # audit boost
+                if boost > 0  and language not in 'en-US':
+                    string = f'Boost: {boost} not supported for language: {language_code}. Skipping'
+                    print(string)
+                    logger.info(string)
+                    boost = 0
+                    continue
 
-                    # only run supported features by language
-                    if language_code not in 'en-US':
-                        if model in en_only:
-                            string = f'CURRENT LANGUAGE SELECTION: {language_code} is not supported for model {model}\n' \
-                                     f'REPLACING {model} with "default"'
-                            print(string)
-                            logger.info(string)
-                            if 'default' not in models:
-                                model = 'default'
-                            else:
-                                continue
-                        # audit boost
-                        if boost > 0:
-                            string = f'Boost: {boost} not supported for language: {language_code}. Skipping'
-                            print(string)
-                            logger.info(string)
-                            boost = 0
-                            continue
-
-                        # only run features that are supported for the model
-                        # alternative_language_codes
-                        if alternative_language_codes and model not in alt_support_models:
-                            string = f'CURRENT MODEL SELECTION: {model} does not support alternative automatic language detection\n' \
-                                     f'This feature will be turned off for this model'
-                            logger.info(string)
-                            print(string)
-                            alternative_language_codes = []
-
+                if enhance and model == 'phone_call':
+                    enhanced_runs = [True, False]
+                else:
+                    enhanced_runs = [False]
                     # Each enhancement option
-                    for use_enhanced in enhanced_runs:
+
+                for use_enhanced in enhanced_runs:
+                    configuration.set_use_enhanced(use_enhanced)
+                    for audio in audio_set:
+                        root = utilities.get_root_filename(audio)
+
+                        #read reference
+                        msg = f'READING: Reference file {cloud_store_uri}/{root}.txt'
+                        print(msg)
+                        logger.info(msg)
+
+                        ref = gcs.read_ref(cloud_store_uri, root + '.txt')
+
                         for run in speech_context_runs:
-
-
-
-                            configuration.set_use_enhanced(use_enhanced)
 
                             # for speech context inclusion / disclusion
                             if run:
                                 configuration.set_speech_context(phrases, boost)
+                                print('Applying speech context')
+                            else:
+                                print('No speech context specified, not applying any speech contexts')
 
                             configuration.set_alternative_language_codes(alternative_language_codes)
                             configuration.set_model(model)
                             configuration.set_sample_rate_hertz(sample_rate_hertz)
-                            configuration.set_language_code(language_code)
+                            configuration.set_language_code(language)
                             configuration.set_encoding(encoding)
                             if audio_channel_count > 1:
                                 configuration.set_audio_channel_count(audio_channel_count)
@@ -321,8 +317,9 @@ if __name__ == "__main__":
 
                             # Calculate WER
                             wer_obj = SimpleWER()
+
                             wer_obj.AddHypRef(hyp, ref)
-                         
+
                             wer , ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
                             string = f'STATS: wer = {wer}, ref words = {ref_word_count}, number of errors = {ref_error_count}'
                             print(string)

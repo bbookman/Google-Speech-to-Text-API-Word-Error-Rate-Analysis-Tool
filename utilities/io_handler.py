@@ -47,11 +47,11 @@ class IOHandler(object):
         deleted_words = ''
         inserted_words = ''
         substitute_words = ''
-        for k, v in deleted_words_dict:
+        for k, v in deleted_words_dict.items():
             deleted_words+= f'{k}:{v}, '
-        for k, v in inserted_words_dict:
+        for k, v in inserted_words_dict.items():
             inserted_words+=  f'{k}:{v}, '
-        for k, v in   substitute_words_dict:
+        for k, v in   substitute_words_dict.items():
             substitute_words+=  f'{k}:{v}, '
 
         full_path = f'{self.get_result_path()}/{self._result_file_name}'
