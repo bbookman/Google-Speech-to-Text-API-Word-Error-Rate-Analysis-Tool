@@ -335,7 +335,7 @@ if __name__ == "__main__":
                                 wer_obj.AddHypRef(hyp, ref)
 
                                 wer , ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
-                                string = f'STATS: wer = {wer}, ref words = {ref_word_count}, number of errors = {ref_error_count}'
+                                string = f'STATS: wer = {wer}%, ref words = {ref_word_count}, number of errors = {ref_error_count}'
                                 print(string)
                                 logger.info(string)
 
@@ -351,13 +351,20 @@ if __name__ == "__main__":
                                 word_count_list = (delete_word_counts, inserted_word_counts,  substituted_word_count  )
 
                                 io_handler.write_csv_header()
-                                io_handler.update_csv(cloud_store_uri, configuration, nlp_model,  word_count_list ,
+
+                                io_handler.update_csv(cloud_store_uri, configuration, NLPModel(),  word_count_list ,
                                                       ref_word_count, ref_error_count, wer, ins, deletions, subs )
 
                                 io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
 
                                 #NLP options
                                 if nlp_model.get_apply_stemming() or nlp_model.get_remove_stop_words() or nlp_model.get_n2w() or nlp_model.get_expand_contractions():
+                                    string = f'STEMMING: {nlp_model.get_apply_stemming()} \n' \
+                                             f'REMOVE STOP WORDS: {nlp_model.get_remove_stop_words()} \n' \
+                                            f'NUMBERS TO WORKDS: {nlp_model.get_n2w()} \n' \
+                                            f'EXPAND CONTRACTIONS: {nlp_model.get_expand_contractions()}'
+                                    print(string)
+                                    logger.debug(string)
                                     # Get NLP results
                                     nlp_result = nlp_options.apply_nlp_options(nlp_model, hyp)
 
