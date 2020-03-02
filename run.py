@@ -86,8 +86,13 @@ if __name__ == "__main__":
     a2p = args.alts2prime
     random_queue = args.random_queue
     use_fake_hyp = args.fake_hyp
+    if alternative_language_codes:
+        alternative_runs = [True, False]
+    else:
+        alternative_runs = [False]
 
-    # if a2p, append the alts to the language list
+
+        # if a2p, append the alts to the language list
     if a2p:
         for code in alternative_language_codes:
             if code not in language_codes:
@@ -267,107 +272,111 @@ if __name__ == "__main__":
 
                 for use_enhanced in enhanced_runs:
                     configuration.set_use_enhanced(use_enhanced)
-                    for audio in audio_set:
-                        root = utilities.get_root_filename(audio)
+                    for alt_run in  alternative_runs:
 
-                        #read reference
-                        msg = f'READING: Reference file {cloud_store_uri}/{root}.txt'
-                        print(msg)
-                        logger.info(msg)
+                        for audio in audio_set:
+                            root = utilities.get_root_filename(audio)
 
-                        ref = gcs.read_ref(cloud_store_uri, root + '.txt')
-
-                        for run in speech_context_runs:
-
-                            # for speech context inclusion / disclusion
-                            if run:
-                                configuration.set_speech_context(phrases, boost)
-                            print(f'Applying speech context: {run}')
-
-                            configuration.set_alternative_language_codes(alternative_language_codes)
-                            configuration.set_model(model)
-                            configuration.set_sample_rate_hertz(sample_rate_hertz)
-                            configuration.set_language_code(language)
-                            configuration.set_encoding(encoding)
-                            if audio_channel_count > 1:
-                                configuration.set_audio_channel_count(audio_channel_count)
-                                configuration.set_enable_separate_recognition_per_channel(True)
-
-                            logger.info(f'CONFIGURATION: {configuration}')
-                            print(f'STARTING')
-                            msg = f'audio: {audio}, {configuration}'
-                            logger.info(msg)
+                            #read reference
+                            msg = f'READING: Reference file {cloud_store_uri}/{root}.txt'
                             print(msg)
+                            logger.info(msg)
+
+                            ref = gcs.read_ref(cloud_store_uri, root + '.txt')
+
+                            for speech_run in speech_context_runs:
+
+                                # for speech context inclusion / disclusion
+                                if speech_run:
+                                    configuration.set_speech_context(phrases, boost)
+                                if alt_run:
+                                    configuration.set_alternative_language_codes(alternative_language_codes)
+                                print(f'Applying speech context: {speech_run}')
+                                print(f'Applying alternative language recog: {alt_run}')
+
+                                configuration.set_model(model)
+                                configuration.set_sample_rate_hertz(sample_rate_hertz)
+                                configuration.set_language_code(language)
+                                configuration.set_encoding(encoding)
+                                if audio_channel_count > 1:
+                                    configuration.set_audio_channel_count(audio_channel_count)
+                                    configuration.set_enable_separate_recognition_per_channel(True)
+
+                                logger.info(f'CONFIGURATION: {configuration}')
+                                print(f'STARTING')
+                                msg = f'audio: {audio}, {configuration}'
+                                logger.info(msg)
+                                print(msg)
 
 
 
-                            # Generate hyp
-                            speech_to_text = SpeechToText()
+                                # Generate hyp
+                                speech_to_text = SpeechToText()
 
-                            if use_fake_hyp:
-                                hyp = 'this is a fake hyp'
-                            else:
-                                hyp = speech_to_text.get_hypothesis(audio, configuration)
-
-
-                            unique_root = utilities.create_unique_root(root, configuration, nlp_model)
-                            io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
+                                if use_fake_hyp:
+                                    hyp = 'this is a fake hyp'
+                                else:
+                                    hyp = speech_to_text.get_hypothesis(audio, configuration)
 
 
-                            # Calculate WER
-                            wer_obj = SimpleWER()
+                                unique_root = utilities.create_unique_root(root, configuration, nlp_model)
+                                io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
 
-                            wer_obj.AddHypRef(hyp, ref)
 
-                            wer , ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
-                            string = f'STATS: wer = {wer}, ref words = {ref_word_count}, number of errors = {ref_error_count}'
-                            print(string)
-                            logger.info(string)
+                                # Calculate WER
+                                wer_obj = SimpleWER()
 
-                            #Remove hyp/ref from WER
-                            wer_obj.AddHypRef('', '')
+                                wer_obj.AddHypRef(hyp, ref)
 
-                            # Get words producing errors
-                            inserted_words, deleted_words, substituted_words = wer_obj.GetMissedWords()
-
-                            delete_word_counts = utilities.get_count_of_word_instances(deleted_words)
-                            inserted_word_counts = utilities.get_count_of_word_instances(inserted_words)
-                            substituted_word_count = utilities.get_count_of_word_instances(substituted_words)
-                            word_count_list = (delete_word_counts, inserted_word_counts,  substituted_word_count  )
-
-                            io_handler.write_csv_header()
-                            io_handler.update_csv(cloud_store_uri, configuration, nlp_model,  word_count_list ,
-                                                  ref_word_count, ref_error_count, wer, ins, deletions, subs )
-
-                            io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
-
-                            #NLP options
-                            if nlp_model.get_apply_stemming() or nlp_model.get_remove_stop_words() or nlp_model.get_n2w() or nlp_model.get_expand_contractions():
-                                # Get NLP results
-                                nlp_result = nlp_options.apply_nlp_options(nlp_model, hyp)
-
-                                # Get WER
-                                wer_obj.AddHypRef(nlp_result, ref)
-                                # return round(wer, 2), nref, total_error, self.wer_info['ins'], self.wer_info['del'], self.wer_info['sub']
-                                wer, ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
-                                string = f'stop: {nlp_model.get_remove_stop_words()}, stem: {nlp_model.get_apply_stemming()}, n2w: {nlp_model.get_n2w()}, exp: {nlp_model.get_expand_contractions()}'
-                                print(string)
-                                logger.info(string)
+                                wer , ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
                                 string = f'STATS: wer = {wer}, ref words = {ref_word_count}, number of errors = {ref_error_count}'
                                 print(string)
                                 logger.info(string)
 
-                                # Write hyp
-                                unique_root = utilities.create_unique_root(root, configuration, nlp_model)
-                                io_handler.write_hyp(file_name=unique_root + '.txt', text=nlp_result)
+                                #Remove hyp/ref from WER
+                                wer_obj.AddHypRef('', '')
 
-                                # Write diagnostic
+                                # Get words producing errors
+                                inserted_words, deleted_words, substituted_words = wer_obj.GetMissedWords()
+
+                                delete_word_counts = utilities.get_count_of_word_instances(deleted_words)
+                                inserted_word_counts = utilities.get_count_of_word_instances(inserted_words)
+                                substituted_word_count = utilities.get_count_of_word_instances(substituted_words)
+                                word_count_list = (delete_word_counts, inserted_word_counts,  substituted_word_count  )
+
+                                io_handler.write_csv_header()
+                                io_handler.update_csv(cloud_store_uri, configuration, nlp_model,  word_count_list ,
+                                                      ref_word_count, ref_error_count, wer, ins, deletions, subs )
 
                                 io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
 
-                                # Update csv
-                                io_handler.update_csv(cloud_store_uri, configuration, nlp_model,
-                                                  ref_word_count, ref_error_count, wer)
+                                #NLP options
+                                if nlp_model.get_apply_stemming() or nlp_model.get_remove_stop_words() or nlp_model.get_n2w() or nlp_model.get_expand_contractions():
+                                    # Get NLP results
+                                    nlp_result = nlp_options.apply_nlp_options(nlp_model, hyp)
+
+                                    # Get WER
+                                    wer_obj.AddHypRef(nlp_result, ref)
+                                    # return round(wer, 2), nref, total_error, self.wer_info['ins'], self.wer_info['del'], self.wer_info['sub']
+                                    wer, ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
+                                    string = f'stop: {nlp_model.get_remove_stop_words()}, stem: {nlp_model.get_apply_stemming()}, n2w: {nlp_model.get_n2w()}, exp: {nlp_model.get_expand_contractions()}'
+                                    print(string)
+                                    logger.info(string)
+                                    string = f'STATS: wer = {wer}, ref words = {ref_word_count}, number of errors = {ref_error_count}'
+                                    print(string)
+                                    logger.info(string)
+
+                                    # Write hyp
+                                    unique_root = utilities.create_unique_root(root, configuration, nlp_model)
+                                    io_handler.write_hyp(file_name=unique_root + '.txt', text=nlp_result)
+
+                                    # Write diagnostic
+
+                                    io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
+
+                                    # Update csv
+                                    io_handler.update_csv(cloud_store_uri, configuration, nlp_model,
+                                                      ref_word_count, ref_error_count, wer)
 
     print('Done')
     print('Deleting queue')
