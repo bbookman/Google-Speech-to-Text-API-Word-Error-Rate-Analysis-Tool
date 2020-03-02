@@ -56,9 +56,9 @@ if __name__ == "__main__":
                         help=('Space separated list of boost values to evaluate for speech adaptation'))
     parser.add_argument('-ch', '--multi', required=False, type=int,
                         help='Integer indicating the number of channels if more than one')
-    parser.add_argument('-a', '--alts2prime', default=False, required=False, action='store_true', help='Use each alternative language as a primary language')
-    parser.add_argument('-q', '--random_queue', default=False, required=False, action='store_true', help='Replaces default queue.txt with randomly named queue file')
-    parser.add_argument('-fake', '--fake_hyp', default=False, required=False, action='store_true', help='Use a fake hypothesis for testing')
+    parser.add_argument('-a', '--alts2prime', required=False, action='store_true', help='Use each alternative language as a primary language')
+    parser.add_argument('-q', '--random_queue', required=False, action='store_true', help='Replaces default queue.txt with randomly named queue file')
+    parser.add_argument('-fake', '--fake_hyp',  required=False, action='store_true', help='Use a fake hypothesis for testing')
 
     nlp_model = NLPModel()
     io_handler = IOHandler()
@@ -80,6 +80,7 @@ if __name__ == "__main__":
     phrase_file_path = args.phrase_file
     boosts = [int(i) for i in args.boosts]
 
+
     boosts.append(0)
     alternative_language_codes = args.alternative_languages
     encoding = args.encoding
@@ -91,8 +92,7 @@ if __name__ == "__main__":
     else:
         alternative_runs = [False]
 
-
-        # if a2p, append the alts to the language list
+    # if a2p, append the alts to the language list
     if a2p:
         for code in alternative_language_codes:
             if code not in language_codes:
@@ -204,6 +204,12 @@ if __name__ == "__main__":
     else:
         queue_file_name = utilities.create_unique_queue_file_name()
         io_handler.set_queue_file_name(queue_file_name)
+        string = f'Random queue file option selected. Queue file: {queue_file_name}'
+        print(string)
+        logger.debug(string)
+        cont = input("Continue Y/N? ")
+        if cont.lower() != "y":
+            sys.exit()
 
     audio_set = utilities.get_audio_set(final_file_list)
     io_handler.write_queue_file(audio_set)
