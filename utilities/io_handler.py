@@ -40,10 +40,21 @@ class IOHandler(object):
             self._csv_header_written = True
 
     def update_csv(self, uri, configuration, nlp_model, word_count_list ,ref_total_word_count = 0, ref_error_count = 0, word_error_rate =0, ins=0, deletions=0, subs=0 ):
+        import logging
+        logging.basicConfig(filename='wer_app.log')
+        logger = logging.getLogger(__name__)
         from collections import OrderedDict
-        deleted_words_dict  = OrderedDict(sorted(word_count_list[0].items(), key=lambda x: x[1]))
-        inserted_words_dict  = OrderedDict(sorted(word_count_list[1].items(), key=lambda x: x[1]))
-        substitute_words_dict = OrderedDict(sorted(word_count_list[2].items(), key=lambda x: x[1]))
+        try:
+            deleted_words_dict  = OrderedDict(sorted(word_count_list[0].items(), key=lambda x: x[1]))
+            inserted_words_dict  = OrderedDict(sorted(word_count_list[1].items(), key=lambda x: x[1]))
+            substitute_words_dict = OrderedDict(sorted(word_count_list[2].items(), key=lambda x: x[1]))
+        except TypeError as t:
+            string = f'{t}'
+            logger.debug(string)
+            print(string)
+            deleted_words_dict = dict()
+            inserted_words_dict = dict()
+            substitute_words_dict = dict()
         deleted_words = ''
         inserted_words = ''
         substitute_words = ''
