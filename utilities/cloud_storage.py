@@ -12,19 +12,22 @@ class GCS(object):
         return bucket, f
 
     def get_file_list(self, uri):
+        logger = logging.getLogger(__name__)
         from google.cloud import storage as storage
         storage_client = storage.Client()
         results = []
         bucket, folder = self._parse_uri(uri)
 
         try:
-            blobs = storage_client.list_blobs(bucket, prefix=folder, max_results=10) #  prefix=folder, delimiter='/'
+            blobs = storage_client.list_blobs(bucket, prefix=folder) #  prefix=folder, delimiter='/'
         except StopIteration as s:
             print(s)
         except IOError as e:
             print(f'Can not get file list from {uri}: {e}')
 
         for blob in blobs:
+            string = f'Blob name: {blob.name}'
+            logger.debug(string)
             slash_loc = blob.name.rfind('/')
             results.append(blob.name[slash_loc+1:])
         return results

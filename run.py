@@ -156,6 +156,7 @@ if __name__ == "__main__":
     gcs = GCS()
     raw_file_list = gcs.get_file_list(cloud_store_uri)
     logger.info(f'RAW STORAGE FILE LIST: {raw_file_list}')
+
     # Filter file list
     utilities = Utilities()
     filtered_file_list = utilities.filter_files(raw_file_list)
@@ -281,9 +282,7 @@ if __name__ == "__main__":
                             # for speech context inclusion / disclusion
                             if run:
                                 configuration.set_speech_context(phrases, boost)
-                                print('Applying speech context')
-                            else:
-                                print('No speech context specified, not applying any speech contexts')
+                            print(f'Applying speech context: {run}')
 
                             configuration.set_alternative_language_codes(alternative_language_codes)
                             configuration.set_model(model)
