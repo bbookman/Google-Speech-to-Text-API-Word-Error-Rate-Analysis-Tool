@@ -118,7 +118,8 @@ if __name__ == "__main__":
                     raise EOFError(f"No data found in {phrase_file_path} ")
         except IOError as e:
             print(f'Could not open phrases file {phrase_file_path}')
-            print(e)
+            sys.exit()
+
 
     if phrases:
         speech_context_runs = [False, True]
@@ -293,12 +294,19 @@ if __name__ == "__main__":
                             for speech_run in speech_context_runs:
 
                                 # for speech context inclusion / disclusion
+                                string = f'Running with phrase hints: {speech_run}, boost {boost}'
+                                print(string)
+                                logger.debug(string)
                                 if speech_run:
                                     configuration.set_speech_context(phrases, boost)
+                                    print(string)
+                                    logger.debug(string)
+
                                 if alt_run:
                                     configuration.set_alternative_language_codes(alternative_language_codes)
-                                print(f'Applying speech context: {speech_run}')
-                                print(f'Applying alternative language recog: {alt_run}')
+                                string = f'Applying alternative language recog: {alt_run}'
+                                print(string)
+                                logger.debug(string)
 
                                 configuration.set_model(model)
                                 configuration.set_sample_rate_hertz(sample_rate_hertz)
@@ -352,7 +360,7 @@ if __name__ == "__main__":
 
                                 io_handler.write_csv_header()
 
-                                io_handler.update_csv(cloud_store_uri, configuration, NLPModel(),  word_count_list ,
+                                io_handler.update_csv(audio, configuration, NLPModel(),  word_count_list ,
                                                       ref_word_count, ref_error_count, wer, ins, deletions, subs )
 
                                 io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
@@ -388,7 +396,7 @@ if __name__ == "__main__":
                                     io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
 
                                     # Update csv
-                                    io_handler.update_csv(cloud_store_uri, configuration, nlp_model,
+                                    io_handler.update_csv(audio, configuration, nlp_model,
                                                       ref_word_count, ref_error_count, wer)
 
     print('Done')

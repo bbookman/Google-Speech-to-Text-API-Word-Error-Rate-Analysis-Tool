@@ -37,14 +37,14 @@ class Configuration(object):
     def get_boost(self):
         return self.boost
 
-    def _set_phrases(self, phrases):
+    def set_phrases(self, phrases):
         self.phrases = phrases
 
-    def _get_phrases(self):
+    def get_phrases(self):
         return self.phrases
 
     def set_speech_context(self, phrases, boost):
-        self._set_phrases(phrases)
+        self.set_phrases(phrases)
         self._set_boost(boost)
         self.speech_context_element['phrases'] = self.phrases
         self.speech_context_element['boost'] = self.boost
@@ -106,7 +106,7 @@ class Configuration(object):
                 f'use_enhanced: {self.useEnhanced}, ' \
                 f'sample_rate: {self.sampleRateHertz}, ' \
                 f'encoding: {self.encoding}, ' \
-                f'phrases: {bool(self._get_phrases())}, boost:{self.get_boost()}, '
+                f'phrases: {bool(self.get_phrases())}, boost:{self.get_boost()}, '
 
         audio_channel_count = self.get_audio_channel_count()
         if audio_channel_count > 1:

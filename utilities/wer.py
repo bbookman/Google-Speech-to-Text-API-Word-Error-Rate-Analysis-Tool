@@ -336,8 +336,7 @@ class SimpleWER(object):
     """
     nref = self.wer_info['nw']
     nref = max(1, nref)  # non_zero value for division
-    total_error = self.wer_info['ins'] \
-        + self.wer_info['del'] + self.wer_info['sub']
+    total_error = self.wer_info['ins'] + self.wer_info['del'] + self.wer_info['sub']
     wer = total_error * 100.0 / nref
     return round(wer, 2), nref, total_error, self.wer_info['ins'], self.wer_info['del'], self.wer_info['sub']
 
