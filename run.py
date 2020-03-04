@@ -25,7 +25,7 @@ if __name__ == "__main__":
     parser.add_argument('-cs', '--cloud_store_uri',
                         help="Cloud storage uri where audio and ground truth expected reference transcriptions are stored",
                         type=str, required=True)
-    parser.add_argument('-lr', '--local_results_path', required=True, help="Path to store generated results")
+    parser.add_argument('-lr', '--local_results_path', required=True, help="Local path to store generated results")
     parser.add_argument('-to', '--transcriptions_only', default=False, required=False,
                         help="If specified the only output will be transcripts, no results will be output",
                         action='store_true')
