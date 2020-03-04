@@ -52,18 +52,21 @@ class IOHandler(object):
             string = f'{t}'
             logger.debug(string)
             print(string)
-            deleted_words_dict = dict()
-            inserted_words_dict = dict()
-            substitute_words_dict = dict()
+            deleted_words_dict = None
+            inserted_words_dict = None
+            substitute_words_dict = None
         deleted_words = ''
         inserted_words = ''
         substitute_words = ''
-        for k, v in deleted_words_dict.items():
-            deleted_words+= f'{k}:{v}, '
-        for k, v in inserted_words_dict.items():
-            inserted_words+=  f'{k}:{v}, '
-        for k, v in   substitute_words_dict.items():
-            substitute_words+=  f'{k}:{v}, '
+        if deleted_words_dict:
+            for k, v in deleted_words_dict.items():
+                deleted_words+= f'{k}:{v}, '
+        if inserted_words_dict:
+            for k, v in inserted_words_dict.items():
+                inserted_words+=  f'{k}:{v}, '
+        if substitute_words_dict:
+            for k, v in substitute_words_dict.items():
+                substitute_words+=  f'{k}:{v}, '
 
         full_path = f'{self.get_result_path()}/{self._result_file_name}'
         alts = ''

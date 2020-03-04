@@ -59,12 +59,14 @@ if __name__ == "__main__":
     parser.add_argument('-a', '--alts2prime', required=False, action='store_true', help='Use each alternative language as a primary language')
     parser.add_argument('-q', '--random_queue', required=False, action='store_true', help='Replaces default queue.txt with randomly named queue file')
     parser.add_argument('-fake', '--fake_hyp',  required=False, action='store_true', help='Use a fake hypothesis for testing')
+    parser.add_argument('-limit', '--limit', required=False, default=None,type= int,  help = 'Limit to X number of audio files')
 
     nlp_model = NLPModel()
     io_handler = IOHandler()
     nlp_options = NLPOptions()
     configuration = Configuration()
     args = parser.parse_args()
+    limit = args.limit
     cloud_store_uri = args.cloud_store_uri
     io_handler.set_result_path(args.local_results_path)
     only_transcribe = args.transcriptions_only
@@ -87,10 +89,7 @@ if __name__ == "__main__":
     a2p = args.alts2prime
     random_queue = args.random_queue
     use_fake_hyp = args.fake_hyp
-    if alternative_language_codes:
-        alternative_runs = [True, False]
-    else:
-        alternative_runs = [False]
+
 
     # if a2p, append the alts to the language list
     if a2p:
@@ -183,10 +182,23 @@ if __name__ == "__main__":
 
     logger.info(f'FILE LIST FOR PROCESSING: {final_file_list}')
 
+    audio_set = utilities.get_audio_set(final_file_list)
+    audio_list = list()
+    if limit:
+        count = 0
+        while count < limit:
+            audio_list.append(audio_set.pop())
+            count+=1
+        string = f'Limit to {limit} audio files'
+        print(string)
+        logger.info(string)
+    else:
+        audio_list = list(audio_set)
+
     # Prompt for confirmation
-    for item in final_file_list:
+    for item in audio_list:
         print(item)
-    confirm = input('\n\nProcess the above files (Y/N)? ')
+    confirm = input('\nProcess the above audio files (Y/N)? ')
     if confirm.lower() == 'n':
         sys.exit(0)
     else:
@@ -212,7 +224,8 @@ if __name__ == "__main__":
         if cont.lower() != "y":
             sys.exit()
 
-    audio_set = utilities.get_audio_set(final_file_list)
+
+
     io_handler.write_queue_file(audio_set)
     print(f'WRITE: {queue_file_name}\n')
 
@@ -279,9 +292,13 @@ if __name__ == "__main__":
 
                 for use_enhanced in enhanced_runs:
                     configuration.set_use_enhanced(use_enhanced)
+                    if alternative_language_codes:
+                        alternative_runs = [True, False]
+                    else:
+                        alternative_runs = [False]
                     for alt_run in  alternative_runs:
 
-                        for audio in audio_set:
+                        for audio in audio_list:
                             root = utilities.get_root_filename(audio)
 
                             #read reference
@@ -294,14 +311,14 @@ if __name__ == "__main__":
                             for speech_run in speech_context_runs:
 
                                 # for speech context inclusion / disclusion
-                                string = f'Running with phrase hints: {speech_run}, boost {boost}'
+                                if boost > 0 and speech_run:
+                                    string = f'Running with phrase hints: {speech_run}, boost {boost}'
+                                else:
+                                    string = 'No speech context applied'
                                 print(string)
                                 logger.debug(string)
                                 if speech_run:
                                     configuration.set_speech_context(phrases, boost)
-                                    print(string)
-                                    logger.debug(string)
-
                                 if alt_run:
                                     configuration.set_alternative_language_codes(alternative_language_codes)
                                 string = f'Applying alternative language recog: {alt_run}'
@@ -402,7 +419,5 @@ if __name__ == "__main__":
     print('Done')
     print('Deleting queue')
     os.remove(queue_file_name)
-
-
 
 
