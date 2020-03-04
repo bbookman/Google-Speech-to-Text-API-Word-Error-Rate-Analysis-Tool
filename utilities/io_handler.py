@@ -39,22 +39,27 @@ class IOHandler(object):
                     print(f'Can not find csv file: {x}')
             self._csv_header_written = True
 
-    def update_csv(self, uri, configuration, nlp_model, word_count_list ,ref_total_word_count = 0, ref_error_count = 0, word_error_rate =0, ins=0, deletions=0, subs=0 ):
+    def update_csv(self, uri, configuration, nlp_model, word_count_list =None ,ref_total_word_count = 0, ref_error_count = 0, word_error_rate =0, ins=0, deletions=0, subs=0 ):
         import logging
         logging.basicConfig(filename='wer_app.log')
         logger = logging.getLogger(__name__)
         from collections import OrderedDict
-        try:
-            deleted_words_dict  = OrderedDict(sorted(word_count_list[0].items(), key=lambda x: x[1]))
-            inserted_words_dict  = OrderedDict(sorted(word_count_list[1].items(), key=lambda x: x[1]))
-            substitute_words_dict = OrderedDict(sorted(word_count_list[2].items(), key=lambda x: x[1]))
-        except TypeError as t:
-            string = f'{t}'
-            logger.debug(string)
-            print(string)
-            deleted_words_dict = None
-            inserted_words_dict = None
-            substitute_words_dict = None
+        deleted_words_dict = dict()
+        inserted_words_dict = dict()
+        substitute_words_dict = dict()
+
+        if word_count_list:
+            try:
+                deleted_words_dict  = OrderedDict(sorted(word_count_list[0].items(), key=lambda x: x[1]))
+                inserted_words_dict  = OrderedDict(sorted(word_count_list[1].items(), key=lambda x: x[1]))
+                substitute_words_dict = OrderedDict(sorted(word_count_list[2].items(), key=lambda x: x[1]))
+            except TypeError as t:
+                string = f'{t}'
+                logger.debug(string)
+                print(string)
+                deleted_words_dict = None
+                inserted_words_dict = None
+                substitute_words_dict = None
         deleted_words = ''
         inserted_words = ''
         substitute_words = ''

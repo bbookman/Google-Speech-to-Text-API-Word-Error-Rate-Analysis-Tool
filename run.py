@@ -140,13 +140,16 @@ if __name__ == "__main__":
     run_enhanced = [False]
     if enhance:
         run_enhanced.append(True)
-        models_contain_phone_call_model = [model for model in models if model=='phone_call']
-        if not models_contain_phone_call_model:
-            warning_string = f'Command line option -e, --enhanced specified but phone_call model not specified in models: {models}. Run will include phone_call model'
+        models_contain_valid_enhanced = [model for model in models if model == 'phone_call' or model =='video']
+        if not models_contain_valid_enhanced:
+            warning_string = f'Command line option -e, --enhanced specified however supported model not specified in models: {models}.  Processing will include phone_call and video models'
             warnings.warn(warning_string)
+            logger.debug(warning_string)
             models.append('phone_call')
+            models.append('video')
 
     logger.info(f'ENHANCED OPTIONS: {run_enhanced}')
+
     #
     #   Correctly set multi channel audio_channel_count
     #
@@ -284,11 +287,10 @@ if __name__ == "__main__":
                     boost = 0
                     continue
 
-                if enhance and model == 'phone_call':
+                if enhance and model == 'phone_call' or enhance and model == 'video':
                     enhanced_runs = [True, False]
                 else:
                     enhanced_runs = [False]
-                    # Each enhancement option
 
                 for use_enhanced in enhanced_runs:
                     configuration.set_use_enhanced(use_enhanced)
