@@ -65,6 +65,9 @@ if __name__ == "__main__":
     io_handler = IOHandler()
     nlp_options = NLPOptions()
     configuration = Configuration()
+    # Turn on punctuation ..  why not.. no bearing on WER
+    configuration.set_enableAutomaticPunctuation(True)
+
     args = parser.parse_args()
     limit = args.limit
     cloud_store_uri = args.cloud_store_uri
