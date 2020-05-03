@@ -1,4 +1,7 @@
 # Google Speech to Text API Word Error Rate Analysis Tool
+
+Note, this tool uses the v1p1beta1 speech api endpoint
+
 [Google Cloud Speech to Text API](https://cloud.google.com/speech-to-text/) offers a number of models and options.  This program is designed to help determine the API options that provide the lowest [Word Error Rate](https://en.wikipedia.org/wiki/Word_error_rate) (WER).
 
 ## Terms and abbreviations
