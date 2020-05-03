@@ -23,7 +23,8 @@ class SpeechToText(object):
             "enable_separate_recognition_per_channel" : configuration.get_enable_separate_recognition_per_channel(),
             "enable_speaker_diarization": configuration.get_enableSpeakerDiarization(),
             "diarization_speaker_count": configuration.get_diarizationSpeakerCount(),
-            "enable_automatic_punctuation": configuration.get_enableAutomaticPunctuation()
+            "enable_automatic_punctuation": configuration.get_enableAutomaticPunctuation(),
+            "speech_contexts": configuration.get_speech_context()
         }
 
 
