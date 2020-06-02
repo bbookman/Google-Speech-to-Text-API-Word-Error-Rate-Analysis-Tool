@@ -64,7 +64,7 @@ class Utilities():
         dot_loc = file_name.rfind('.')
         return file_name[dot_loc+1:]
 
-    def filter_files(self, files):
+    def filter_files(self, files, only_transcribe):
         import copy
         valid_types = list()
         # Remove unsupported file types
@@ -88,7 +88,7 @@ class Utilities():
         r_root_set = set(ref_roots)
         orphan_audio_files = a_root_set.difference(r_root_set)
         orphan_audio_removed = copy.deepcopy(valid_types)
-        if orphan_audio_files:
+        if orphan_audio_files and not only_transcribe:
             for root in orphan_audio_files:
                 for file in valid_types:
                     if root in file:
