@@ -329,6 +329,8 @@ if __name__ == "__main__":
                                 logger.debug(string)
                                 if speech_run:
                                     configuration.set_speech_context(phrases, boost)
+                                else:
+                                    configuration.set_speech_context([], 0)
                                 if alt_run:
                                     configuration.set_alternative_language_codes(alternative_language_codes)
                                 string = f'Applying alternative language recog: {alt_run}'
