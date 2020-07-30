@@ -126,7 +126,10 @@ if __name__ == "__main__":
 
 
     if phrases:
-        speech_context_runs = [False, True]
+        if no_zeros_for_boost:
+            speech_context_runs = [True]
+        else:
+            speech_context_runs = [False, True]
         logger.info(f'PHRASES: {phrases}')
     else:
         speech_context_runs = [False]
