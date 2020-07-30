@@ -60,6 +60,7 @@ if __name__ == "__main__":
     parser.add_argument('-q', '--random_queue', required=False, action='store_true', help='Replaces default queue.txt with randomly named queue file')
     parser.add_argument('-fake', '--fake_hyp',  required=False, action='store_true', help='Use a fake hypothesis for testing')
     parser.add_argument('-limit', '--limit', required=False, default=None,type= int,  help = 'Limit to X number of audio files')
+    parser.add_argument('-nzb', '--no_zeros_boost', required=False,  action='store_true', help='skip boost of 0' )
 
     nlp_model = NLPModel()
     io_handler = IOHandler()
@@ -69,6 +70,7 @@ if __name__ == "__main__":
     configuration.set_enableAutomaticPunctuation(True)
 
     args = parser.parse_args()
+    no_zeros_for_boost = args.no_zeros_boost
     limit = args.limit
     cloud_store_uri = args.cloud_store_uri
     io_handler.set_result_path(args.local_results_path)
@@ -85,8 +87,8 @@ if __name__ == "__main__":
     phrase_file_path = args.phrase_file
     boosts = [int(i) for i in args.boosts]
 
-
-    boosts.append(0)
+    if not no_zeros_for_boost:
+        boosts.append(0)
     alternative_language_codes = args.alternative_languages
     encoding = args.encoding
     a2p = args.alts2prime
