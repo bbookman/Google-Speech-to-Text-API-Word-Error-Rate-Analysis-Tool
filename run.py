@@ -320,7 +320,7 @@ if __name__ == "__main__":
 
                             for speech_run in speech_context_runs:
 
-                                # for speech context inclusion / disclusion
+                                # for speech context
                                 if boost > 0 and speech_run:
                                     string = f'Running with phrase hints: {speech_run}, boost {boost}'
                                 else:
@@ -398,7 +398,7 @@ if __name__ == "__main__":
                                     if nlp_model.get_apply_stemming() or nlp_model.get_remove_stop_words() or nlp_model.get_n2w() or nlp_model.get_expand_contractions():
                                         string = f'STEMMING: {nlp_model.get_apply_stemming()} \n' \
                                                  f'REMOVE STOP WORDS: {nlp_model.get_remove_stop_words()} \n' \
-                                                f'NUMBERS TO WORKDS: {nlp_model.get_n2w()} \n' \
+                                                f'NUMBERS TO WORDS: {nlp_model.get_n2w()} \n' \
                                                 f'EXPAND CONTRACTIONS: {nlp_model.get_expand_contractions()}'
                                         print(string)
                                         logger.debug(string)

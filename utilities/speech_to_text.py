@@ -1,5 +1,6 @@
 from model.configuration import Configuration
 from google.cloud import speech_v1p1beta1 as speech
+import google
 import logging
 
 # logging setup
@@ -29,9 +30,13 @@ class SpeechToText(object):
 
 
         audio = {"uri": uri}
-        operation = client.long_running_recognize(config, audio)
+        operation = object
+        try:
+            operation = client.long_running_recognize(config, audio)
+        except google.api_core.exceptions.InvalidArgument as e:
+            raise e
         count = 0
-        sleep_time = 15
+        sleep_time = 5
         while not operation.done() and count != 30000:
             print(f"{operation.metadata.progress_percent}% complete - updates every {sleep_time} seconds")
             if count == 29999:
