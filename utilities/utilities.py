@@ -201,5 +201,12 @@ class Utilities():
             result[word] = count
         return result
 
-
-
+    def strip_puc(text):
+        punc = '''!()-[]{};:'"\, <>./?@#$%^&*_~¿'''
+        result = ''
+        # Removing punctuations in string 
+        # Using loop + punctuation string 
+        for element in text:
+            if element in punc:
+                result = text.replace(element, "")
+        return result

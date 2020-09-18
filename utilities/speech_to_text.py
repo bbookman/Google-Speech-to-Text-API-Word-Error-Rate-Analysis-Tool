@@ -2,6 +2,7 @@ from model.configuration import Configuration
 from google.cloud import speech_v1p1beta1 as speech
 import google
 import logging
+from utilities.utilities import Utilities
 
 # logging setup
 logging.basicConfig(filename='wer_app.log', level=logging.DEBUG)
@@ -28,7 +29,7 @@ class SpeechToText(object):
             "speech_contexts": configuration.get_speech_context()
         }
 
-
+        utilities = Utilities()
         audio = {"uri": uri}
         operation = object
         try:
@@ -53,5 +54,5 @@ class SpeechToText(object):
             transcript += " " + result.alternatives[0].transcript
         if not transcript:
             logger.debug('No transcript returned')
-
-        return transcript
+        t = utilities.strip_puc(text= transcript)
+        return t.lower()

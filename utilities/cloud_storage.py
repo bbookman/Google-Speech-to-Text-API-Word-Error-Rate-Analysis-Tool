@@ -1,4 +1,5 @@
 import logging
+from utilities.utilities import Utilities
 
 class GCS(object):
 
@@ -34,11 +35,16 @@ class GCS(object):
 
     def read_ref(self, uri, txt_file):
         from google.cloud import storage as storage
+        utilities = Utilities
         client = storage.Client()
         bucket, folder = self._parse_uri(uri)
         b = client.bucket(bucket)
         path = f"{folder}/{txt_file}"
         blob = b.get_blob(path)
-        result = blob.download_as_string().decode('utf-8')
+        #result = blob.download_as_string().decode('utf-8')
+        result = blob.download_as_string().decode('latin-1')
         r = result.replace('\n', '')
+        r = str(r)
+        r = r.lower()
+        r = utilities.strip_puc(text = r)
         return r
