@@ -108,20 +108,20 @@ def HighlightAlignedHtml(hyp, ref, err_type):
     if hyp != ref:
       raise ValueError('hyp (%s) does not match ref (%s) for none error' %
                        (hyp, ref))
-    highlighted_html += '%s ' % hyp
-
+    #highlighted_html += '%s ' % hyp
+    highlighted_html += f'<span style="background-color: lightgreen">{hyp}</span>'
   elif err_type == 'sub':
-    highlighted_html += """<span style="background-color: greenyellow">
+    highlighted_html += """<span style="background-color: orange">
         <del>%s</del></span><span style="background-color: yellow">
         %s </span> """ % (hyp, ref)
 
   elif err_type == 'del':
-    highlighted_html += """<span style="background-color: yellow">
+    highlighted_html += """<span style="background-color: red">
         %s</span> """ % (
             ref)
 
   elif err_type == 'ins':
-    highlighted_html += """<span style="background-color: greenyellow">
+    highlighted_html += """<span style="background-color: aqua">
         <del>%s</del> </span> """ % (
             hyp)
 

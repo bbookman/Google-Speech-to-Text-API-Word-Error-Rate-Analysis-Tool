@@ -92,7 +92,15 @@ class IOHandler(object):
 
     def write_html_diagnostic(self, wer_obj, unique_root, result_path):
         aligned_html = '<br>'.join(wer_obj.aligned_htmls)
+        aligned_html += '<h1>KEY</h1>'
+        aligned_html += """<span style="background-color: lightgreen">
+                MATCH</span> | """
+        aligned_html += """<span style="background-color: aqua">
+        INSERTION</span> | """
+        ligned_html += """<span style="background-color: red">DELETION</span> | """
+        aligned_html += """<span style="background-color: orange">API</span> <span style="background-color: yellow">EXPECTED</span> (SUBSTITUTION)"""
 
+        a
         result_file = unique_root + '.html'
         write_path = f'{result_path}/{result_file}'
         with open(write_path, 'w') as f:
