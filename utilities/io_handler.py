@@ -97,7 +97,7 @@ class IOHandler(object):
                 MATCH</span> | """
         aligned_html += """<span style="background-color: aqua">
         INSERTION</span> | """
-        ligned_html += """<span style="background-color: red">DELETION</span> | """
+        aligned_html += """<span style="background-color: red">DELETION</span> | """
         aligned_html += """<span style="background-color: orange">API</span> <span style="background-color: yellow">EXPECTED</span> (SUBSTITUTION)"""
 
         a
