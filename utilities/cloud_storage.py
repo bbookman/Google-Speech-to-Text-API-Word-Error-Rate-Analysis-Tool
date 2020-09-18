@@ -35,7 +35,7 @@ class GCS(object):
 
     def read_ref(self, uri, txt_file):
         from google.cloud import storage as storage
-        utilities = Utilities
+
         client = storage.Client()
         bucket, folder = self._parse_uri(uri)
         b = client.bucket(bucket)
@@ -46,5 +46,6 @@ class GCS(object):
         r = result.replace('\n', '')
         r = str(r)
         r = r.lower()
+        utilities = Utilities()
         r = utilities.strip_puc(text = r)
         return r

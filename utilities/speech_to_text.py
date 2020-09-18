@@ -29,7 +29,7 @@ class SpeechToText(object):
             "speech_contexts": configuration.get_speech_context()
         }
 
-        utilities = Utilities()
+
         audio = {"uri": uri}
         operation = object
         try:
@@ -54,5 +54,6 @@ class SpeechToText(object):
             transcript += " " + result.alternatives[0].transcript
         if not transcript:
             logger.debug('No transcript returned')
+        utilities = Utilities()
         t = utilities.strip_puc(text= transcript)
         return t.lower()
