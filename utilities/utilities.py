@@ -205,6 +205,13 @@ class Utilities():
         return result
 
     def strip_puc(self, text=''):
+
+        import logging
+        # logging setup
+        logging.basicConfig(filename='wer_app.log', level=logging.DEBUG)
+        logger = logging.getLogger(__name__)
+        logger.debug(f'STRIP IN: {text}')
         result = text.replace('¿',' ')
         result = result.replace('.', ' ')
+        logger.debug(f'STRIP OUT: {result}')
         return result

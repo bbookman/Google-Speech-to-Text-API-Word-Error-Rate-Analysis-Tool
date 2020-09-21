@@ -49,6 +49,10 @@ from __future__ import print_function
 import re
 import sys
 from six.moves import range
+import logging
+# logging setup
+logging.basicConfig(filename='wer_app.log', level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 def TxtPreprocess(txt):
@@ -102,14 +106,15 @@ def HighlightAlignedHtml(hyp, ref, err_type):
     ValueError: if err_type is not among ['none', 'sub', 'del', 'ins'].
       or if when err_type == 'none', hyp != ref
   """
-
+  #logging.debug(f'REF in HighlightAlignedHtml: {ref}')
+  #logging.debug(f'HYP IN HighlightAlignedHtml: {hyp}')
   highlighted_html = ''
   if err_type == 'none':
     if hyp != ref:
       raise ValueError('hyp (%s) does not match ref (%s) for none error' %
                        (hyp, ref))
     #highlighted_html += '%s ' % hyp
-    highlighted_html += f'<span style="background-color: lightgreen">{hyp}</span>'
+    highlighted_html += f'<span style="background-color: lightgreen">{hyp} </span>'
   elif err_type == 'sub':
     highlighted_html += """<span style="background-color: orange">
         <del>%s</del></span><span style="background-color: yellow">
@@ -242,6 +247,8 @@ class SimpleWER(object):
     if self._preprocess_handler:
       hypothesis = self._preprocess_handler(hypothesis)
       reference = self._preprocess_handler(reference)
+      logging.debug(f'HYP in _preprocess_handler: {hypothesis}')
+      logging.debug(f'REF in _preprocess_handler: {reference}')
 
     # Compute edit distance.
     hyp_words = hypothesis.split()

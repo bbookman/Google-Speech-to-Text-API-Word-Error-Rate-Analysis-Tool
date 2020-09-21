@@ -323,6 +323,7 @@ if __name__ == "__main__":
 
                                 ref = gcs.read_ref(cloud_store_uri, root + '.txt')
 
+                                logger.debug(f'REF ORIGINAL: {ref}')
                             for speech_run in speech_context_runs:
 
                                 # for speech context
@@ -365,7 +366,7 @@ if __name__ == "__main__":
                                     hyp = 'this is a fake hyp'
                                 else:
                                     hyp = speech_to_text.get_hypothesis(audio, configuration)
-
+                                logger.debug(f'HYP ORIGINAL: {hyp}')
 
                                 unique_root = utilities.create_unique_root(root, configuration, nlp_model)
                                 io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)

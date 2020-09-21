@@ -35,7 +35,7 @@ class GCS(object):
 
     def read_ref(self, uri, txt_file):
         from google.cloud import storage as storage
-
+        logger = logging.getLogger(__name__)
         client = storage.Client()
         bucket, folder = self._parse_uri(uri)
         b = client.bucket(bucket)
@@ -48,4 +48,5 @@ class GCS(object):
         r = r.lower()
         utilities = Utilities()
         r = utilities.strip_puc(text = r)
+        logger.debug(f'REF STRIPPED: {r}')
         return r
