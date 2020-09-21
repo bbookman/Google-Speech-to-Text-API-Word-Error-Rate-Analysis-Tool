@@ -92,8 +92,11 @@ class Utilities():
             for root in orphan_audio_files:
                 for file in valid_types:
                     if root in file:
-                        orphan_audio_removed.remove(file)
-                        print(f'INFO: audio file {file} does not have corresponding reference file and will be ignored')
+                        try:
+                            orphan_audio_removed.remove(file)
+                            print(f'INFO: audio file {file} does not have corresponding reference file and will be ignored')
+                        except ValueError:
+                            pass
 
         # Remove any reference file that has no corresponding audio file
         orphan_reference_files = r_root_set.difference(a_root_set)
@@ -202,6 +205,6 @@ class Utilities():
         return result
 
     def strip_puc(self, text=''):
-        result = text.replace('¿','')
-        result = result.replace('.', '')
+        result = text.replace('¿',' ')
+        result = result.replace('.', ' ')
         return result

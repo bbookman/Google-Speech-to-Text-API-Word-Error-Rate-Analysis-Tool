@@ -100,7 +100,6 @@ class IOHandler(object):
         aligned_html += """<span style="background-color: red">DELETION</span> | """
         aligned_html += """<span style="background-color: orange">API</span> <span style="background-color: yellow">EXPECTED</span> (SUBSTITUTION)"""
 
-        a
         result_file = unique_root + '.html'
         write_path = f'{result_path}/{result_file}'
         with open(write_path, 'w') as f:
