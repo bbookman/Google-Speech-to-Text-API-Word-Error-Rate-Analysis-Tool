@@ -213,5 +213,6 @@ class Utilities():
         logger.debug(f'STRIP IN: {text}')
         result = text.replace('¿',' ')
         result = result.replace('.', ' ')
+        result = result.replace('?', ' ')
         logger.debug(f'STRIP OUT: {result}')
         return result
