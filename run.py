@@ -56,7 +56,6 @@ if __name__ == "__main__":
                         help=('Space separated list of boost values to evaluate for speech adaptation'))
     parser.add_argument('-ch', '--multi', required=False, type=int,
                         help='Integer indicating the number of channels if more than one')
-    parser.add_argument('-a', '--alts2prime', required=False, action='store_true', help='Use each alternative language as a primary language')
     parser.add_argument('-q', '--random_queue', required=False, action='store_true', help='Replaces default queue.txt with randomly named queue file')
     parser.add_argument('-fake', '--fake_hyp',  required=False, action='store_true', help='Use a fake hypothesis for testing')
     parser.add_argument('-limit', '--limit', required=False, default=None,type= int,  help = 'Limit to X number of audio files')
@@ -91,16 +90,10 @@ if __name__ == "__main__":
         boosts.append(0)
     alternative_language_codes = args.alternative_languages
     encoding = args.encoding
-    a2p = args.alts2prime
+
     random_queue = args.random_queue
     use_fake_hyp = args.fake_hyp
 
-
-    # if a2p, append the alts to the language list
-    if a2p:
-        for code in alternative_language_codes:
-            if code not in language_codes:
-                language_codes.append(code)
 
     phrases = list()
     #
@@ -248,7 +241,6 @@ if __name__ == "__main__":
                     f'enhanced: {enhance}\n'
                     f'language: {language_codes}\n'
                     f'alternative language codes: {alternative_language_codes}\n'
-                    f'use alternative language codes as primary: {a2p}\n'
                     f'encoding: {encoding}\n'
                     f'sample rate: {sample_rate_hertz}\n'
                     f'audio channels: {audio_channel_count}\n'
