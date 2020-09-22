@@ -58,17 +58,15 @@ class SpeechToText(object):
         t = utilities.strip_puc(text= transcript)
         return t.lower()
 
-    def transcribe_streaming(stream_file, configuration):
+    def transcribe_streaming(self, stream_file, configuration):
         """Streams transcription of the given audio file."""
         import io
         client = speech.SpeechClient()
+        output = ''
 
         with io.open(stream_file, 'rb') as audio_file:
-            content = audio_file.read()
+            audio_content = audio_file.read()
 
-        # In practice, stream should be a generator yielding chunks of audio data.
-        stream = [content]
-        audio_content = [chunk for chunk in stream]
 
 
         config = {
@@ -86,21 +84,32 @@ class SpeechToText(object):
             "speech_contexts": configuration.get_speech_context()
         }
 
-        streaming_config = {"config": config,
-                            "single_utternace": True
-                            }
-        # streaming_recognize returns a generator.
-        responses = client.streaming_recognize(streaming_config, audio_content)
+        streaming_config = speech.types.StreamingRecognitionConfig(
+            config=config,
+            interim_results=True)
 
+        # BUG IS HERE
+
+        #requests = speech.types.StreamingRecognizeRequest(
+        #    audio_content=audio_content)
+
+        stream = [audio_content]
+        requests = (speech.types.StreamingRecognizeRequest(audio_content=chunk)
+                    for chunk in stream)
+
+        responses = client.streaming_recognize(streaming_config,
+                                               requests)
+
+        #import pdb; pdb.set_trace()
         for response in responses:
             # Once the transcription has settled, the first result will contain the
             # is_final result. The other results will be for subsequent portions of
             # the audio.
             for result in response.results:
-                print('Finished: {}'.format(result.is_final))
-                print('Stability: {}'.format(result.stability))
                 alternatives = result.alternatives
                 # The alternatives are ordered from most likely to least.
                 for alternative in alternatives:
-                    print('Confidence: {}'.format(alternative.confidence))
-                    print(u'Transcript: {}'.format(alternative.transcript))
+                    output = ''.join(alternative.transcript)
+
+        return output
+

@@ -293,7 +293,6 @@ if __name__ == "__main__":
                     else:
                         ref = io_handler.read_file(local_files_path + '/' + root + '.txt')
 
-
                     #for speech_run in speech_context_runs:
                     for boost in boosts:
                         for language in language_codes:
@@ -333,7 +332,8 @@ if __name__ == "__main__":
                             if use_fake_hyp:
                                 hyp = 'this is a fake hyp'
                             elif local_files_path:
-                                hyp = speech_to_text.transcribe_streaming(audio, configuration)
+                                file = local_files_path + '/' + audio
+                                hyp = speech_to_text.transcribe_streaming(file, configuration)
                             else:
                                 hyp = speech_to_text.get_hypothesis(audio, configuration)
 
