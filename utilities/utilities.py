@@ -216,3 +216,10 @@ class Utilities():
         result = result.replace('?', ' ')
         logger.debug(f'STRIP OUT: {result}')
         return result
+
+    def local_files(self, path):
+        import os
+        for file in os.listdir(path):
+            if os.path.isfile(os.path.join(path, file)):
+                yield file
+

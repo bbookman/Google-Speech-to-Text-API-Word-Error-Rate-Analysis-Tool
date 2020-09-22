@@ -58,6 +58,7 @@ if __name__ == "__main__":
     parser.add_argument('-limit', '--limit', required=False, default=None,type= int,  help = 'Limit to X number of audio files')
     parser.add_argument('-nzb', '--no_zeros_boost', required=False,  action='store_true', help='skip boost of 0' )
     parser.add_argument('-single', '--single_word', required=False, action='store_true', help='process each letter rather than whole words')
+    parser.add_argument('-lf','--local_files_path', required=False, type=str, help='process local files',  default=None)
 
     nlp_model = NLPModel()
     io_handler = IOHandler()
@@ -69,6 +70,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     no_zeros_for_boost = args.no_zeros_boost
     process_each_letter = args.single_word
+    local_files_path = args.local_files_path
     limit = args.limit
     cloud_store_uri = args.cloud_store_uri
     io_handler.set_result_path(args.local_results_path)
@@ -93,29 +95,15 @@ if __name__ == "__main__":
     random_queue = args.random_queue
     use_fake_hyp = args.fake_hyp
 
+    # init utilities
+    utilities = Utilities()
 
-    phrases = list()
     #
     #   Audit phrase file
     #
+    phrases = list()
     if phrase_file_path:
-        # validate phrase file exists
-        try:
-            os.path.isfile(phrase_file_path)
-        except FileNotFoundError as e:
-            print(f'Phrase file not found at {phrase_file_path}')
-            print(e)
-        # If phrase file exists, read phrases
-        try:
-            with open(phrase_file_path, 'r') as file:
-                contents = file.read()
-                phrases = contents.split()
-                if not phrases:
-                    raise EOFError(f"No data found in {phrase_file_path} ")
-        except IOError as e:
-            print(f'Could not open phrases file {phrase_file_path}')
-            sys.exit()
-
+        phrases = io_handler.read_file(phrase_file_path)
 
     if phrases:
         if no_zeros_for_boost:
@@ -130,8 +118,8 @@ if __name__ == "__main__":
     # if boosts exist, there should be phrases
     if boosts !=[0] and not phrase_file_path:
         raise FileNotFoundError(f'Boosts {boosts} specified, but no phrase file specified.')
-
     logger.info(f'BOOSTS: {boosts}')
+
     #
     #   Audit enhanced option
     #
@@ -160,16 +148,31 @@ if __name__ == "__main__":
         audio_channel_count = 1
 
     logger.info(f'AUDIO CHANNEL COUNT: {audio_channel_count}')
-    # Get list of all files in google cloud storage (gcs) bucket
-    gcs = GCS()
-    raw_file_list = gcs.get_file_list(cloud_store_uri)
-    logger.info(f'RAW STORAGE FILE LIST: {raw_file_list}')
+
+    raw_file_list = list()
+    # Get either local files or cloud storage
+
+    #import pdb;pdb.set_trace()
+    if not local_files_path:
+        # Get list of all files in google cloud storage (gcs) bucket
+        gcs = GCS()
+        raw_file_list = gcs.get_file_list(cloud_store_uri)
+    else:
+        raw_file_list = utilities.local_files(local_files_path)
+
+    logger.info(f'RAW FILE LIST: {raw_file_list}')
 
     # Filter file list
-    utilities = Utilities()
     filtered_file_list = utilities.filter_files(raw_file_list, only_transcribe)
-    final_file_list = [utilities.append_uri(cloud_store_uri, file) for file in filtered_file_list]
 
+    if not local_files_path:
+        final_file_list = [utilities.append_uri(cloud_store_uri, file) for file in filtered_file_list]
+    else:
+        final_file_list = filtered_file_list
+
+    logger.info(f'FINAL FILE LIST: {final_file_list}')
+
+    import pdb;pdb.set_trace()
     # if only doing transcriptions, add diarization and punctuation?
     dia = False
     punct = False
@@ -185,9 +188,6 @@ if __name__ == "__main__":
         punct = input('Add Punctuation Y/N? ')
         if punct.lower() == 'y':
             configuration.set_enableAutomaticPunctuation(True)
-
-
-    logger.info(f'FILE LIST FOR PROCESSING: {final_file_list}')
 
     audio_set = utilities.get_audio_set(final_file_list)
     audio_list = list()
@@ -288,9 +288,12 @@ if __name__ == "__main__":
                         print(msg)
                         logger.info(msg)
 
+                    if not local_files_path:
                         ref = gcs.read_ref(cloud_store_uri, root + '.txt')
+                    else:
+                        ref = io_handler.read_file(local_files_path + '/' + root + '.txt')
 
-                        #logger.debug(f'REF ORIGINAL: {ref}')
+
                     #for speech_run in speech_context_runs:
                     for boost in boosts:
                         for language in language_codes:
@@ -331,7 +334,7 @@ if __name__ == "__main__":
                                 hyp = 'this is a fake hyp'
                             else:
                                 hyp = speech_to_text.get_hypothesis(audio, configuration)
-                            #logger.debug(f'HYP ORIGINAL: {hyp}')
+
 
                             unique_root = utilities.create_unique_root(root, configuration, nlp_model)
                             io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
