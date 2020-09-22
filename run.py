@@ -21,7 +21,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-cs', '--cloud_store_uri',
                         help="Cloud storage uri where audio and ground truth expected reference transcriptions are stored",
-                        type=str, required=True)
+                        type=str, required=False)
     parser.add_argument('-lr', '--local_results_path', required=True, help="Local path to store generated results")
     parser.add_argument('-to', '--transcriptions_only', default=False, required=False,
                         help="If specified the only output will be transcripts, no results will be output",
@@ -350,9 +350,10 @@ if __name__ == "__main__":
                                 if process_each_letter:
                                     hyp = list(hyp)
                                     hyp = ' '.join(hyp)
-                                    ref = list(hyp)
+                                    ref = list(ref)
                                     ref = ' '.join(ref)
 
+                                import pdb;pdb.set_trace()
                                 wer_obj.AddHypRef(hyp, ref)
 
                                 wer , ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
