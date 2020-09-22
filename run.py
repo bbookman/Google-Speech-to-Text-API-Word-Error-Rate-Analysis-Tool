@@ -13,9 +13,6 @@ import logging
 
 if __name__ == "__main__":
 
-    #en_only = ['phone_call', 'video']
-    alt_support_models = ['default','command_and_search']
-
     #logger setup
     logging.basicConfig(filename='wer_app.log')
     logger = logging.getLogger(__name__)
@@ -266,13 +263,6 @@ if __name__ == "__main__":
 
 
     for model in models:
-        # only run features that are supported for the model
-        if alternative_language_codes and model not in alt_support_models:
-            string = f'CURRENT MODEL SELECTION: {model} does not support alternative automatic language detection\n' \
-                     f'This feature will be turned off for this model'
-            logger.info(string)
-            print(string)
-            alternative_language_codes = []
 
         if enhance and model == 'phone_call' or enhance and model == 'video':
             enhanced_runs = [True, False]
