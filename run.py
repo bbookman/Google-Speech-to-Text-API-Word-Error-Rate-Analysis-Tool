@@ -57,6 +57,7 @@ if __name__ == "__main__":
     parser.add_argument('-fake', '--fake_hyp',  required=False, action='store_true', help='Use a fake hypothesis for testing')
     parser.add_argument('-limit', '--limit', required=False, default=None,type= int,  help = 'Limit to X number of audio files')
     parser.add_argument('-nzb', '--no_zeros_boost', required=False,  action='store_true', help='skip boost of 0' )
+    parser.add_argument('-single', '--single_word', required=False, action='store_true', help='process each letter rather than whole words')
 
     nlp_model = NLPModel()
     io_handler = IOHandler()
@@ -67,6 +68,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     no_zeros_for_boost = args.no_zeros_boost
+    process_each_letter = args.single_word
     limit = args.limit
     cloud_store_uri = args.cloud_store_uri
     io_handler.set_result_path(args.local_results_path)
@@ -339,6 +341,13 @@ if __name__ == "__main__":
                                 wer_obj = SimpleWER()
                                 hyp = hyp.replace(' ', '')
                                 ref = ref.replace(' ', '')
+
+                                if process_each_letter:
+                                    hyp = list(hyp)
+                                    hyp = ' '.join(hyp)
+                                    ref = list(hyp)
+                                    ref = ' '.join(ref)
+
                                 wer_obj.AddHypRef(hyp, ref)
 
                                 wer , ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
