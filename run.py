@@ -172,7 +172,7 @@ if __name__ == "__main__":
 
     logger.info(f'FINAL FILE LIST: {final_file_list}')
 
-    import pdb;pdb.set_trace()
+    
     # if only doing transcriptions, add diarization and punctuation?
     dia = False
     punct = False
@@ -332,6 +332,8 @@ if __name__ == "__main__":
 
                             if use_fake_hyp:
                                 hyp = 'this is a fake hyp'
+                            elif local_files_path:
+                                hyp = speech_to_text.transcribe_streaming(audio, configuration)
                             else:
                                 hyp = speech_to_text.get_hypothesis(audio, configuration)
 
