@@ -163,5 +163,5 @@ class IOHandler(object):
         except IOError as e:
             print(f'Could not open file {file_path}')
             raise
-
+        result = ''.join(result)
         return result

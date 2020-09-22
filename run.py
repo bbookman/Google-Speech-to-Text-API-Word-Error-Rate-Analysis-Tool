@@ -21,7 +21,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-cs', '--cloud_store_uri',
                         help="Cloud storage uri where audio and ground truth expected reference transcriptions are stored",
-                        type=str, required=True)
+                        type=str, required=False)
     parser.add_argument('-lr', '--local_results_path', required=True, help="Local path to store generated results")
     parser.add_argument('-to', '--transcriptions_only', default=False, required=False,
                         help="If specified the only output will be transcripts, no results will be output",
@@ -152,7 +152,7 @@ if __name__ == "__main__":
     raw_file_list = list()
     # Get either local files or cloud storage
 
-    #import pdb;pdb.set_trace()
+
     if not local_files_path:
         # Get list of all files in google cloud storage (gcs) bucket
         gcs = GCS()
@@ -292,7 +292,6 @@ if __name__ == "__main__":
                     else:
                         ref = io_handler.read_file(local_files_path + '/' + root + '.txt')
 
-
                     #for speech_run in speech_context_runs:
                     for boost in boosts:
                         for language in language_codes:
@@ -331,6 +330,9 @@ if __name__ == "__main__":
 
                             if use_fake_hyp:
                                 hyp = 'this is a fake hyp'
+                            elif local_files_path:
+                                file = local_files_path + '/' + audio
+                                hyp = speech_to_text.transcribe_streaming(file, configuration)
                             else:
                                 hyp = speech_to_text.get_hypothesis(audio, configuration)
 
@@ -347,7 +349,7 @@ if __name__ == "__main__":
                                 if process_each_letter:
                                     hyp = list(hyp)
                                     hyp = ' '.join(hyp)
-                                    ref = list(hyp)
+                                    ref = list(ref)
                                     ref = ' '.join(ref)
 
                                 wer_obj.AddHypRef(hyp, ref)
