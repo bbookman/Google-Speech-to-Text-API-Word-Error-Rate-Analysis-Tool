@@ -145,3 +145,23 @@ class IOHandler(object):
 
         with open(p, 'w+') as f:
             f.write(text)
+
+    def read_file(self, file_path):
+        import os
+        try:
+            os.path.isfile(file_path)
+        except FileNotFoundError as e:
+            print(f'File not found at {file_path}')
+            print(e)
+        # If phrase file exists, read phrases
+        try:
+            with open(file_path, 'r') as file:
+                contents = file.read()
+                result = contents.split()
+                if not result:
+                    raise EOFError(f"No data found in {file_path} ")
+        except IOError as e:
+            print(f'Could not open file {file_path}')
+            raise
+
+        return result
