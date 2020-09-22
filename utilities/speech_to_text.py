@@ -57,3 +57,50 @@ class SpeechToText(object):
         utilities = Utilities()
         t = utilities.strip_puc(text= transcript)
         return t.lower()
+
+    def transcribe_streaming(stream_file, configuration):
+        """Streams transcription of the given audio file."""
+        import io
+        client = speech.SpeechClient()
+
+        with io.open(stream_file, 'rb') as audio_file:
+            content = audio_file.read()
+
+        # In practice, stream should be a generator yielding chunks of audio data.
+        stream = [content]
+        audio_content = [chunk for chunk in stream]
+
+
+        config = {
+            "model": configuration.get_model(),
+            "use_enhanced": configuration.get_use_enhanced(),
+            "encoding": configuration.get_encoding(),
+            "sample_rate_hertz": configuration.get_sample_rate_hertz(),
+            "language_code": configuration.get_language_code(),
+            "alternative_language_codes": configuration.get_alternative_language_codes(),
+            "audio_channel_count": configuration.get_audio_channel_count(),
+            "enable_separate_recognition_per_channel": configuration.get_enable_separate_recognition_per_channel(),
+            "enable_speaker_diarization": configuration.get_enableSpeakerDiarization(),
+            "diarization_speaker_count": configuration.get_diarizationSpeakerCount(),
+            "enable_automatic_punctuation": configuration.get_enableAutomaticPunctuation(),
+            "speech_contexts": configuration.get_speech_context()
+        }
+
+        streaming_config = {"config": config,
+                            "single_utternace": True
+                            }
+        # streaming_recognize returns a generator.
+        responses = client.streaming_recognize(streaming_config, audio_content)
+
+        for response in responses:
+            # Once the transcription has settled, the first result will contain the
+            # is_final result. The other results will be for subsequent portions of
+            # the audio.
+            for result in response.results:
+                print('Finished: {}'.format(result.is_final))
+                print('Stability: {}'.format(result.stability))
+                alternatives = result.alternatives
+                # The alternatives are ordered from most likely to least.
+                for alternative in alternatives:
+                    print('Confidence: {}'.format(alternative.confidence))
+                    print(u'Transcript: {}'.format(alternative.transcript))
