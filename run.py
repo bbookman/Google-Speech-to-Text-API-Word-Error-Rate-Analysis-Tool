@@ -152,7 +152,7 @@ if __name__ == "__main__":
     raw_file_list = list()
     # Get either local files or cloud storage
 
-    #import pdb;pdb.set_trace()
+
     if not local_files_path:
         # Get list of all files in google cloud storage (gcs) bucket
         gcs = GCS()
@@ -352,7 +352,6 @@ if __name__ == "__main__":
                                     hyp = ' '.join(hyp)
                                     ref = list(ref)
                                     ref = ' '.join(ref)
-
 
                                 wer_obj.AddHypRef(hyp, ref)
 
