@@ -353,7 +353,7 @@ if __name__ == "__main__":
                                     ref = list(ref)
                                     ref = ' '.join(ref)
 
-                                import pdb;pdb.set_trace()
+
                                 wer_obj.AddHypRef(hyp, ref)
 
                                 wer , ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
