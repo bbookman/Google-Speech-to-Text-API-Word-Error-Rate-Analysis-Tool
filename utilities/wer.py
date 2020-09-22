@@ -75,7 +75,8 @@ def TxtPreprocess(txt):
 
   # Remove extra space.
   txt = re.sub(' +', ' ', txt.strip())
-
+  txt = list(txt)
+  txt = ' '.join(txt)
   return txt
 
 
@@ -147,6 +148,9 @@ def ComputeEditDistanceMatrix(hyp_words, ref_words):
     Edit distance matrix (in the format of list of lists), where the first
     index is the reference and the second index is the hypothesis.
   """
+  #import pdb; pdb.set_trace()
+  #ref_words = [i for i in ref_words]
+  #hyp_words = [t for t in hyp_words]
   reference_length_plus = len(ref_words) + 1
   hypothesis_length_plus = len(hyp_words) + 1
   edit_dist_mat = [[]] * reference_length_plus
@@ -250,7 +254,7 @@ class SimpleWER(object):
       logging.debug(f'HYP in _preprocess_handler: {hypothesis}')
       logging.debug(f'REF in _preprocess_handler: {reference}')
 
-    # Compute edit distance.
+    # Compute edit distance.   ....  add space for each letter
     hyp_words = hypothesis.split()
     ref_words = reference.split()
     distmat = ComputeEditDistanceMatrix(hyp_words, ref_words)

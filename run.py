@@ -337,7 +337,8 @@ if __name__ == "__main__":
                             if not only_transcribe:
                                 # Calculate WER
                                 wer_obj = SimpleWER()
-
+                                hyp = hyp.replace(' ', '')
+                                ref = ref.replace(' ', '')
                                 wer_obj.AddHypRef(hyp, ref)
 
                                 wer , ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
