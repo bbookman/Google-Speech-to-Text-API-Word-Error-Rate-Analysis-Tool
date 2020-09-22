@@ -172,7 +172,6 @@ if __name__ == "__main__":
 
     logger.info(f'FINAL FILE LIST: {final_file_list}')
 
-    import pdb;pdb.set_trace()
     # if only doing transcriptions, add diarization and punctuation?
     dia = False
     punct = False
