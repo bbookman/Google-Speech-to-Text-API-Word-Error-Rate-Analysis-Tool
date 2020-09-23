@@ -4,7 +4,6 @@ from model.nlp import NLPModel
 class IOHandler(object):
     _result_path = ''
     _result_file_name = 'results.csv'
-    _csv_header = 'WER, AUDIO_FILE, MODEL, ENHANCED, LANGUAGE, ALTERNATIVE_LANGS, PHRASE_HINTS_APPLIED, BOOST, REF_WORD_COUNT, REF_ERROR_COUNT , STEMMING_APPLIED , STOP_WORDS_REMOVED, NUMBER_TO_WORD_CONVERSION, CONTRACTIONS_EXPANDED, INSERTIONS, DELETIONS, SUBSTITUTIONS, DELETED_WORDS, INSERTED_WORDS, SUBSTITUTE_WORDS\n'
     _csv_header_written = False
     configuration = Configuration()
     nlp_model = NLPModel()
@@ -22,8 +21,32 @@ class IOHandler(object):
     def get_result_path(self):
         return self._result_path
 
-    def write_csv_header(self):
+    def write_csv_header(self, configuration, nlp_model):
         import os
+
+        csv_header = 'WER, AUDIO_FILE, MODEL,'
+        if configuration.get_use_enhanced():
+            csv_header+= 'ENHANCED,'
+        csv_header+= 'LANGUAGE,'
+        if configuration.get_alternative_language_codes():
+            csv_header+= 'ALTERNATIVE_LANGS,'
+        if configuration.get_phrases():
+            csv_header+= 'PHRASE_HINTS_APPLIED,'
+        if configuration.get_boost():
+            csv_header+= 'BOOST,'
+
+        csv_header+= 'REF_WORD_COUNT, REF_ERROR_COUNT ,'
+        if nlp_model.get_apply_stemming():
+            csv_header+= 'STEMMING_APPLIED ,'
+        if nlp_model.get_remove_stop_words():
+            csv_header += 'STOP_WORDS_REMOVED,'
+        if nlp_model.get_n2w():
+            csv_header += 'NUMBER_TO_WORD_CONVERSION,'
+        if nlp_model.get_expand_contractions():
+            csv_header += 'CONTRACTIONS_EXPANDED,'
+        csv_header+= 'INSERTIONS, DELETIONS, SUBSTITUTIONS, DELETED_WORDS, INSERTED_WORDS, SUBSTITUTE_WORDS\n'
+
+
         if not self._csv_header_written:
             full_path = f'{self.get_result_path()}/{self._result_file_name}'
             # if path does not exists, make it
@@ -32,14 +55,14 @@ class IOHandler(object):
 
             with open(full_path, 'w') as file:
                 try:
-                    file.write(self._csv_header)
+                    file.write(csv_header)
                 except IOError as i:
                     print(f'Can not write csv header: {i}')
                 except FileNotFoundError as x:
                     print(f'Can not find csv file: {x}')
             self._csv_header_written = True
 
-    def update_csv(self, uri, configuration, nlp_model, word_count_list =None ,ref_total_word_count = 0, ref_error_count = 0, word_error_rate =0, ins=0, deletions=0, subs=0 ):
+    def update_csv(self, word_error_rate, uri, configuration, nlp_model, word_count_list =None ,ref_total_word_count = 0, ref_error_count = 0,  ins=0, deletions=0, subs=0 ):
         import logging
         logging.basicConfig(filename='wer_app.log')
         logger = logging.getLogger(__name__)
@@ -74,7 +97,11 @@ class IOHandler(object):
                 substitute_words+=  f'{k}:{v}, '
         full_path = f'{self.get_result_path()}/{self._result_file_name}'
 
-        string = f'{word_error_rate},{uri}, {configuration.get_model()}, {configuration.get_use_enhanced()}, {configuration.get_language_code()},'
+        string = f'{word_error_rate},{uri}, {configuration.get_model()}, '
+        if configuration.get_use_enhanced():
+            string += 'ENHANCED,'
+
+        string+= f'{configuration.get_language_code()},'
 
         if configuration.get_alternative_language_codes():
             alts = ''
