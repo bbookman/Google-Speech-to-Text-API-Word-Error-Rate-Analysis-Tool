@@ -4,7 +4,7 @@ from model.nlp import NLPModel
 class IOHandler(object):
     _result_path = ''
     _result_file_name = 'results.csv'
-    _csv_header = 'AUDIO_FILE, MODEL, ENHANCED, LANGUAGE, ALTERNATIVE_LANGS, PHRASE_HINTS_APPLIED, BOOST, REF_WORD_COUNT, REF_ERROR_COUNT , WER,STEMMING_APPLIED , STOP_WORDS_REMOVED, NUMBER_TO_WORD_CONVERSION, CONTRACTIONS_EXPANDED, INSERTIONS, DELETIONS, SUBSTITUTIONS, DELETED_WORDS, INSERTED_WORDS, SUBSTITUTE_WORDS\n'
+    _csv_header = 'WER, AUDIO_FILE, MODEL, ENHANCED, LANGUAGE, ALTERNATIVE_LANGS, PHRASE_HINTS_APPLIED, BOOST, REF_WORD_COUNT, REF_ERROR_COUNT , STEMMING_APPLIED , STOP_WORDS_REMOVED, NUMBER_TO_WORD_CONVERSION, CONTRACTIONS_EXPANDED, INSERTIONS, DELETIONS, SUBSTITUTIONS, DELETED_WORDS, INSERTED_WORDS, SUBSTITUTE_WORDS\n'
     _csv_header_written = False
     configuration = Configuration()
     nlp_model = NLPModel()
@@ -72,15 +72,29 @@ class IOHandler(object):
         if substitute_words_dict:
             for k, v in substitute_words_dict.items():
                 substitute_words+=  f'{k}:{v}, '
-
         full_path = f'{self.get_result_path()}/{self._result_file_name}'
-        alts = ''
-        for item in (configuration.get_alternative_language_codes()):
-            alts+=item + ' '
-        string = f'{uri}, {configuration.get_model()}, {configuration.get_use_enhanced()}, {configuration.get_language_code()},' \
-                 f'{alts}, {bool(configuration.get_phrases())},' \
-                 f'{configuration.get_boost()}, {ref_total_word_count}, {ref_error_count}, {word_error_rate}, {nlp_model.get_apply_stemming()},' \
-                 f'{nlp_model.get_remove_stop_words()}, {nlp_model.get_n2w()}, {nlp_model.get_expand_contractions()}, {ins}, {deletions}, {subs}, ' \
+
+        string = f'{word_error_rate},{uri}, {configuration.get_model()}, {configuration.get_use_enhanced()}, {configuration.get_language_code()},'
+
+        if configuration.get_alternative_language_codes():
+            alts = ''
+            for item in (configuration.get_alternative_language_codes()):
+                alts += item + ' '
+            string += f'{alts},'
+        if bool(configuration.get_phrases()):
+            string += f'{bool(configuration.get_phrases())},'
+        if configuration.get_boost() is not None:
+            string += f'{configuration.get_boost()},'
+        string+= f'{ref_total_word_count}, {ref_error_count},'
+        if nlp_model.get_apply_stemming():
+            string+=  f'{nlp_model.get_apply_stemming()},'
+        if nlp_model.get_remove_stop_words():
+            string += f'{nlp_model.get_remove_stop_words()},'
+        if nlp_model.get_n2w():
+            string += f'{nlp_model.get_n2w()},'
+        if nlp_model.get_expand_contractions():
+            string+=f'{nlp_model.get_expand_contractions()},'
+        string+= f'{ins}, {deletions}, {subs}, ' \
                  f'{deleted_words}, {inserted_words}, {substitute_words}\n'
         with open(full_path, 'a+',) as file:
             try:
