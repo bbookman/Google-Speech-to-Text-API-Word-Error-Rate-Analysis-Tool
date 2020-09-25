@@ -59,6 +59,7 @@ if __name__ == "__main__":
     parser.add_argument('-nzb', '--no_zeros_boost', required=False,  action='store_true', help='skip boost of 0' )
     parser.add_argument('-single', '--single_word', required=False, action='store_true', help='process each letter rather than whole words')
     parser.add_argument('-lf','--local_files_path', required=False, type=str, help='process local files',  default=None)
+    parser.add_argument('-k', '--key_words', required=False, action='store_true', help='use speech adaptation phrase file as keywords')
 
     nlp_model = NLPModel()
     io_handler = IOHandler()
@@ -72,6 +73,7 @@ if __name__ == "__main__":
     process_each_letter = args.single_word
     local_files_path = args.local_files_path
     limit = args.limit
+    keywords_on = args.key_words
     cloud_store_uri = args.cloud_store_uri
     io_handler.set_result_path(args.local_results_path)
     only_transcribe = args.transcriptions_only
@@ -102,9 +104,10 @@ if __name__ == "__main__":
     #   Audit phrase file
     #
     phrases = list()
+    key_words = list()
     if phrase_file_path:
         phrases = io_handler.read_file(phrase_file_path)
-
+        key_words = phrases
     if phrases:
         if no_zeros_for_boost:
             speech_context_runs = [True]
@@ -362,6 +365,11 @@ if __name__ == "__main__":
                                 #Remove hyp/ref from WER
                                 wer_obj.AddHypRef('', '')
 
+                                key_words = key_words.split(',')
+                                wer_obj.key_phrases = key_words
+
+                                str_sum, str_details, str_keyphrases_info = wer_obj.GetSummaries()
+
                                 # Get words producing errors
                                 inserted_words, deleted_words, substituted_words = wer_obj.GetMissedWords()
 
@@ -370,9 +378,9 @@ if __name__ == "__main__":
                                 substituted_word_count = utilities.get_count_of_word_instances(substituted_words)
                                 word_count_list = (delete_word_counts, inserted_word_counts,  substituted_word_count  )
 
-                                io_handler.write_csv_header(configuration, nlp_model)
+                                io_handler.write_csv_header(configuration, nlp_model, key_words)
 
-                                io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list )
+                                io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list, key_words )
                                 io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
 
                                 #NLP options

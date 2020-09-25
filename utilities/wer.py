@@ -344,6 +344,7 @@ class SimpleWER(object):
     Returns:
       WER as percentage number, usually between 0.0 to 100.0
     """
+
     nref = self.wer_info['nw']
     nref = max(1, nref)  # non_zero value for division
     total_error = self.wer_info['ins'] + self.wer_info['del'] + self.wer_info['sub']
@@ -360,7 +361,6 @@ class SimpleWER(object):
       ref_keyphrases:  num of key phrases in the reference strings.
       hyp_keyphrases:  num of key phrases in the hypothesis strings.
     """
-
     matched_k = sum(self.matched_keyphrase_counts.values())
     ref_k = sum(self.ref_keyphrase_counts.values())
     hyp_k = sum(self.hyp_keyphrase_counts.values())
@@ -369,6 +369,7 @@ class SimpleWER(object):
     jaccard_similarity = matched_k * 1.0 / joined_k
 
     f1_k = 2.0 * matched_k / max(ref_k + hyp_k, 1.0)
+
     return (jaccard_similarity, f1_k, matched_k, ref_k, hyp_k)
 
   def GetSummaries(self):
@@ -382,8 +383,9 @@ class SimpleWER(object):
     nref = self.wer_info['nw']
     total_error = self.wer_info['ins'] \
         + self.wer_info['del'] + self.wer_info['sub']
-    str_sum = 'total WER = %d, total word = %d, wer = %.2f%%' % (
-        total_error, nref, self.GetWER())
+    str_sum =''
+    #str_sum = 'total WER = %d, total word = %d, wer = %.2f%%' % (
+    #    total_error, nref, self.GetWER())
 
     str_details = 'Error breakdown: del = %.2f%%, ins=%.2f%%, sub=%.2f%%' % (
         self.wer_info['del'] * 100.0 / nref, self.wer_info['ins'] * 100.0 /
