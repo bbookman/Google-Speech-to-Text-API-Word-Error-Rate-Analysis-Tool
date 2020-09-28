@@ -364,11 +364,14 @@ if __name__ == "__main__":
 
                                 # Get words producing errors
                                 inserted_words, deleted_words, substituted_words = wer_obj.GetMissedWords()
-
                                 delete_word_counts = utilities.get_count_of_word_instances(deleted_words)
                                 inserted_word_counts = utilities.get_count_of_word_instances(inserted_words)
                                 substituted_word_count = utilities.get_count_of_word_instances(substituted_words)
+                                logger.debug(f'INSERTED WORDS: {inserted_words}')
+                                logger.debug(f'DELETED WORDS {deleted_words}')
+                                logger.debug(f'SUBSTITUTED WORDS: {substituted_words}')
                                 word_count_list = (delete_word_counts, inserted_word_counts,  substituted_word_count  )
+                                logger.debug(f'WORD COUNT LIST: {word_count_list}')
 
                                 io_handler.write_csv_header(configuration, nlp_model)
 

@@ -196,7 +196,7 @@ class IOHandler(object):
             print(e)
         # If phrase file exists, read phrases
         try:
-            with open(file_path, 'r') as file:
+            with open(file_path, 'r',  encoding='latin-1') as file:
                 contents = file.read()
                 result = contents.split()
                 if not result:

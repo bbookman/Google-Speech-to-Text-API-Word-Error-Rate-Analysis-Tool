@@ -41,7 +41,6 @@ class GCS(object):
         b = client.bucket(bucket)
         path = f"{folder}/{txt_file}"
         blob = b.get_blob(path)
-        #result = blob.download_as_string().decode('utf-8')
         result = blob.download_as_string().decode('latin-1')
         r = result.replace('\n', '')
         r = str(r)
