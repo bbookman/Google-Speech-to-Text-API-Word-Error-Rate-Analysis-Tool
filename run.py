@@ -291,7 +291,7 @@ if __name__ == "__main__":
                         ref = gcs.read_ref(cloud_store_uri, root + '.txt')
                     else:
                         ref = io_handler.read_file(local_files_path + '/' + root + '.txt')
-
+                    logger.debug(f'INIT REF: {ref}')
                     #for speech_run in speech_context_runs:
                     for boost in boosts:
                         for language in language_codes:
@@ -343,8 +343,8 @@ if __name__ == "__main__":
                             if not only_transcribe:
                                 # Calculate WER
                                 wer_obj = SimpleWER()
-                                hyp = hyp.replace(' ', '')
-                                ref = ref.replace(' ', '')
+                                #hyp = hyp.replace(' ', '')
+                                #ref = ref.replace(' ', '')
 
                                 if process_each_letter:
                                     hyp = list(hyp)
