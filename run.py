@@ -110,15 +110,15 @@ if __name__ == "__main__":
             speech_context_runs = [True]
         else:
             speech_context_runs = [False, True]
-        logger.info(f'PHRASES: {phrases}')
+        logger.debug(f'PHRASES: {phrases}')
     else:
         speech_context_runs = [False]
-        logger.info('NO SPEECH CONTEXT IN USE')
+        logger.debug('NO SPEECH CONTEXT IN USE')
 
     # if boosts exist, there should be phrases
     if boosts !=[0] and not phrase_file_path:
         raise FileNotFoundError(f'Boosts {boosts} specified, but no phrase file specified.')
-    logger.info(f'BOOSTS: {boosts}')
+    logger.debug(f'BOOSTS: {boosts}')
 
     #
     #   Audit enhanced option
@@ -136,7 +136,7 @@ if __name__ == "__main__":
             models.append('phone_call')
             models.append('video')
 
-    logger.info(f'ENHANCED OPTIONS: {run_enhanced}')
+    logger.debug(f'ENHANCED OPTIONS: {run_enhanced}')
 
     #
     #   Correctly set multi channel audio_channel_count
@@ -147,7 +147,7 @@ if __name__ == "__main__":
     else:
         audio_channel_count = 1
 
-    logger.info(f'AUDIO CHANNEL COUNT: {audio_channel_count}')
+    logger.debug(f'AUDIO CHANNEL COUNT: {audio_channel_count}')
 
     raw_file_list = list()
     # Get either local files or cloud storage
@@ -160,7 +160,7 @@ if __name__ == "__main__":
     else:
         raw_file_list = utilities.local_files(local_files_path)
 
-    logger.info(f'RAW FILE LIST: {raw_file_list}')
+    logger.debug(f'RAW FILE LIST: {raw_file_list}')
 
     # Filter file list
     filtered_file_list = utilities.filter_files(raw_file_list, only_transcribe)
@@ -170,7 +170,7 @@ if __name__ == "__main__":
     else:
         final_file_list = filtered_file_list
 
-    logger.info(f'FINAL FILE LIST: {final_file_list}')
+    logger.debug(f'FINAL FILE LIST: {final_file_list}')
 
     # if only doing transcriptions, add diarization and punctuation?
     dia = False
@@ -189,6 +189,7 @@ if __name__ == "__main__":
             configuration.set_enableAutomaticPunctuation(True)
 
     audio_set = utilities.get_audio_set(final_file_list)
+    logger.debug(f'AUDIO SET: {audio_set}')
     audio_list = list()
     if limit:
         count = 0
@@ -197,7 +198,7 @@ if __name__ == "__main__":
             count+=1
         string = f'Limit to {limit} audio files'
         print(string)
-        logger.info(string)
+        logger.debug(string)
     else:
         audio_list = list(audio_set)
 
@@ -243,6 +244,7 @@ if __name__ == "__main__":
                     f'sample rate: {sample_rate_hertz}\n'
                     f'audio channels: {audio_channel_count}\n'
                     f'speech context: {bool(phrases)}, boosts: {boosts}\n'
+                    f'process each char: {process_each_letter}\n'
                     f'expand numbers to words: {nlp_model.get_n2w()}\n'
                     f'remove stop words: {nlp_model.get_remove_stop_words()}\n'
                     f'expand contractions: {nlp_model.expand_contractions}\n'
@@ -259,12 +261,12 @@ if __name__ == "__main__":
     queue_string = io_handler.read_queue_file()
     queue = queue_string.split(',')
     queue.remove('')
-    logger.info(f'QUEUE: {queue}')
+    logger.debug(f'QUEUE: {queue}')
 
 
 
     for model in models:
-
+        logger.debug(f'CURRENT MODEL: {model}')
         if enhance and model == 'phone_call' or enhance and model == 'video':
             enhanced_runs = [True, False]
         else:
@@ -272,12 +274,15 @@ if __name__ == "__main__":
 
         for use_enhanced in enhanced_runs:
             configuration.set_use_enhanced(use_enhanced)
+            logger.debug(f'ENAHANCED: {use_enhanced}')
             if alternative_language_codes:
                 alternative_runs = [True, False]
             else:
                 alternative_runs = [False]
-            for alt_run in  alternative_runs:
 
+
+            for alt_run in  alternative_runs:
+                logger.debug(f'ALT RUN: {alt_run}')
                 for audio in audio_list:
                     root = utilities.get_root_filename(audio)
 
@@ -285,7 +290,7 @@ if __name__ == "__main__":
                     if not only_transcribe:
                         msg = f'READING: Reference file {cloud_store_uri}/{root}.txt'
                         print(msg)
-                        logger.info(msg)
+                        logger.debug(msg)
 
                     if not local_files_path:
                         ref = gcs.read_ref(cloud_store_uri, root + '.txt')
@@ -317,10 +322,10 @@ if __name__ == "__main__":
                                 configuration.set_audio_channel_count(audio_channel_count)
                                 configuration.set_enable_separate_recognition_per_channel(True)
 
-                            logger.info(f'CONFIGURATION: {configuration}')
+                            logger.debug(f'CONFIGURATION: {configuration}')
                             print(f'STARTING')
                             msg = f'audio: {audio}, {configuration}'
-                            logger.info(msg)
+                            logger.debug(msg)
                             print(msg)
 
 
@@ -336,28 +341,30 @@ if __name__ == "__main__":
                             else:
                                 hyp = speech_to_text.get_hypothesis(audio, configuration)
 
-
+                            logger.debug(f'RAW HYP: {hyp}')
+                            logger.debug(f'RAW REF {ref}')
                             unique_root = utilities.create_unique_root(root, configuration, nlp_model)
                             io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
 
                             if not only_transcribe:
                                 # Calculate WER
                                 wer_obj = SimpleWER()
-                                #hyp = hyp.replace(' ', '')
-                                #ref = ref.replace(' ', '')
 
                                 if process_each_letter:
+                                    logger.debug('PROCESSING EACH CHARACTER')
                                     hyp = list(hyp)
                                     hyp = ' '.join(hyp)
                                     ref = list(ref)
                                     ref = ' '.join(ref)
 
+                                logger.debug(f'HYP FOR WER: {hyp}')
+                                logger.debug(f'REF FOR WER: {ref}')
                                 wer_obj.AddHypRef(hyp, ref)
 
                                 wer , ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
                                 string = f'STATS: wer = {wer}%, ref words = {ref_word_count}, number of errors = {ref_error_count}'
                                 print(string)
-                                logger.info(string)
+                                logger.debug(string)
 
                                 #Remove hyp/ref from WER
                                 wer_obj.AddHypRef('', '')
@@ -395,10 +402,10 @@ if __name__ == "__main__":
                                     wer, ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
                                     string = f'stop: {nlp_model.get_remove_stop_words()}, stem: {nlp_model.get_apply_stemming()}, n2w: {nlp_model.get_n2w()}, exp: {nlp_model.get_expand_contractions()}'
                                     print(string)
-                                    logger.info(string)
+                                    logger.debug(string)
                                     string = f'STATS: wer = {wer}, ref words = {ref_word_count}, number of errors = {ref_error_count}'
                                     print(string)
-                                    logger.info(string)
+                                    logger.debug(string)
 
                                     # Write hyp
                                     unique_root = utilities.create_unique_root(root, configuration, nlp_model)
