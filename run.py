@@ -57,7 +57,7 @@ if __name__ == "__main__":
     parser.add_argument('-fake', '--fake_hyp',  required=False, action='store_true', help='Use a fake hypothesis for testing')
     parser.add_argument('-limit', '--limit', required=False, default=None,type= int,  help = 'Limit to X number of audio files')
     parser.add_argument('-nzb', '--no_zeros_boost', required=False,  action='store_true', help='skip boost of 0' )
-    parser.add_argument('-single', '--single_word', required=False, action='store_true', help='process each letter rather than whole words')
+    parser.add_argument('-chxch', '--character_by_character', required=False, action='store_true', help='process each letter rather than whole words')
     parser.add_argument('-lf','--local_files_path', required=False, type=str, help='process local files',  default=None)
     parser.add_argument('-k', '--key_words', required=False, action='store_true', help='use speech adaptation phrase file as keywords')
 
@@ -70,7 +70,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     no_zeros_for_boost = args.no_zeros_boost
-    process_each_letter = args.single_word
+    process_each_character = args.character_by_character
     local_files_path = args.local_files_path
     limit = args.limit
     keywords_on = args.key_words
@@ -341,20 +341,26 @@ if __name__ == "__main__":
 
 
                             unique_root = utilities.create_unique_root(root, configuration, nlp_model)
-                            io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
+                            if only_transcribe:
+                                io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
 
                             if not only_transcribe:
                                 # Calculate WER
-                                wer_obj = SimpleWER()
-                                hyp = hyp.replace(' ', '')
-                                ref = ref.replace(' ', '')
+                                if keywords_on:
+                                    wer_obj = SimpleWER(key_phrases= phrases)
+                            
+                                    if phrases not in hyp:
+                                        hyp = ''
+                                    else:
+                                        hyp = phrases
 
-                                if process_each_letter:
+
+                                if process_each_character:
                                     hyp = list(hyp)
                                     hyp = ' '.join(hyp)
                                     ref = list(ref)
                                     ref = ' '.join(ref)
-
+                                io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
                                 wer_obj.AddHypRef(hyp, ref)
 
                                 wer , ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
@@ -364,9 +370,6 @@ if __name__ == "__main__":
 
                                 #Remove hyp/ref from WER
                                 wer_obj.AddHypRef('', '')
-
-                                key_words = key_words.split(',')
-                                wer_obj.key_phrases = key_words
 
                                 str_sum, str_details, str_keyphrases_info = wer_obj.GetSummaries()
 
