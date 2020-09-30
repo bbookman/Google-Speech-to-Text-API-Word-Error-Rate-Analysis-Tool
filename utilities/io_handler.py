@@ -21,7 +21,7 @@ class IOHandler(object):
     def get_result_path(self):
         return self._result_path
 
-    def write_csv_header(self, configuration, nlp_model):
+    def write_csv_header(self, configuration, nlp_model, str_keyphrases_info=None):
         import os
 
         csv_header = 'WER, AUDIO_FILE, MODEL,'
@@ -44,6 +44,8 @@ class IOHandler(object):
             csv_header += 'NUMBER_TO_WORD_CONVERSION,'
         if nlp_model.get_expand_contractions():
             csv_header += 'CONTRACTIONS_EXPANDED,'
+        if str_keyphrases_info:
+            csv_header += 'KEY STATS'
         csv_header+= 'INSERTIONS, DELETIONS, SUBSTITUTIONS, DELETED_WORDS, INSERTED_WORDS, SUBSTITUTE_WORDS\n'
 
 
@@ -62,7 +64,7 @@ class IOHandler(object):
                     print(f'Can not find csv file: {x}')
             self._csv_header_written = True
 
-    def update_csv(self, word_error_rate, uri, configuration, nlp_model, word_count_list =None ,ref_total_word_count = 0, ref_error_count = 0,  ins=0, deletions=0, subs=0 ):
+    def update_csv(self, word_error_rate, uri, configuration, nlp_model, word_count_list =None , str_keyphrases_info = None,ref_total_word_count = 0, ref_error_count = 0,  ins=0, deletions=0, subs=0 ):
         import logging
         logging.basicConfig(filename='wer_app.log')
         logger = logging.getLogger(__name__)
@@ -121,6 +123,8 @@ class IOHandler(object):
             string += f'{nlp_model.get_n2w()},'
         if nlp_model.get_expand_contractions():
             string+=f'{nlp_model.get_expand_contractions()},'
+        if str_keyphrases_info:
+            string+= f'{str_keyphrases_info}'
         string+= f'{ins}, {deletions}, {subs}, ' \
                  f'{deleted_words}, {inserted_words}, {substitute_words}\n'
         with open(full_path, 'a+',) as file:
@@ -196,13 +200,24 @@ class IOHandler(object):
             print(e)
         # If phrase file exists, read phrases
         try:
+<<<<<<< HEAD
             with open(file_path, 'r',  encoding='latin-1') as file:
+=======
+            with open(file_path, 'r', encoding='latin-1') as file:
+>>>>>>> keywords
                 contents = file.read()
-                result = contents.split()
+                r = contents.split(',')
+                r = ''.join(r)
+                result = r.replace('\n', '')
                 if not result:
                     raise EOFError(f"No data found in {file_path} ")
         except IOError as e:
             print(f'Could not open file {file_path}')
             raise
+<<<<<<< HEAD
         result = ' '.join(result)
         return result
+=======
+        return result.lower()
+
+>>>>>>> keywords

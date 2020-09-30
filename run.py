@@ -57,8 +57,9 @@ if __name__ == "__main__":
     parser.add_argument('-fake', '--fake_hyp',  required=False, action='store_true', help='Use a fake hypothesis for testing')
     parser.add_argument('-limit', '--limit', required=False, default=None,type= int,  help = 'Limit to X number of audio files')
     parser.add_argument('-nzb', '--no_zeros_boost', required=False,  action='store_true', help='skip boost of 0' )
-    parser.add_argument('-single', '--single_word', required=False, action='store_true', help='process each letter rather than whole words')
+    parser.add_argument('-chxch', '--character_by_character', required=False, action='store_true', help='process each letter rather than whole words')
     parser.add_argument('-lf','--local_files_path', required=False, type=str, help='process local files',  default=None)
+    parser.add_argument('-k', '--key_words', required=False, action='store_true', help='use speech adaptation phrase file as keywords')
 
     nlp_model = NLPModel()
     io_handler = IOHandler()
@@ -69,9 +70,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     no_zeros_for_boost = args.no_zeros_boost
-    process_each_letter = args.single_word
+    process_each_character = args.character_by_character
     local_files_path = args.local_files_path
     limit = args.limit
+    keywords_on = args.key_words
     cloud_store_uri = args.cloud_store_uri
     io_handler.set_result_path(args.local_results_path)
     only_transcribe = args.transcriptions_only
@@ -102,9 +104,11 @@ if __name__ == "__main__":
     #   Audit phrase file
     #
     phrases = list()
+    key_words = list()
     if phrase_file_path:
         phrases = io_handler.read_file(phrase_file_path)
-
+        phrases.lower()
+        key_words = phrases
     if phrases:
         if no_zeros_for_boost:
             speech_context_runs = [True]
@@ -296,7 +300,10 @@ if __name__ == "__main__":
                         ref = gcs.read_ref(cloud_store_uri, root + '.txt')
                     else:
                         ref = io_handler.read_file(local_files_path + '/' + root + '.txt')
+
                     logger.debug(f'INIT REF: {ref}')
+
+
                     #for speech_run in speech_context_runs:
                     for boost in boosts:
                         for language in language_codes:
@@ -340,11 +347,16 @@ if __name__ == "__main__":
                                 hyp = speech_to_text.transcribe_streaming(file, configuration)
                             else:
                                 hyp = speech_to_text.get_hypothesis(audio, configuration)
+                            hyp = hyp.lower()
+                            ref = ref.lower()
+                            logger.debug(f'ORIGINAL REF: {ref}')
+                            logger.debug(f'ORIGINAL HYP: {hyp}')
 
-                            logger.debug(f'RAW HYP: {hyp}')
-                            logger.debug(f'RAW REF {ref}')
+                            wer_obj = SimpleWER()
+
                             unique_root = utilities.create_unique_root(root, configuration, nlp_model)
-                            io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
+                            if only_transcribe:
+                                io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
 
                             if not only_transcribe:
                                 # Calculate WER
@@ -352,6 +364,18 @@ if __name__ == "__main__":
 
                                 if process_each_letter:
                                     logger.debug('PROCESSING EACH CHARACTER')
+
+                                if keywords_on:
+                                    wer_obj = SimpleWER(key_phrases= key_words )
+                                    ref = key_words
+
+                                    if key_words.lower() not in hyp:
+                                        hyp = ''
+                                    else:
+                                        hyp = key_words.lower()
+
+                                if process_each_character:
+
                                     hyp = list(hyp)
                                     hyp = ' '.join(hyp)
                                     ref = list(ref)
@@ -359,6 +383,9 @@ if __name__ == "__main__":
 
                                 logger.debug(f'HYP FOR WER: {hyp}')
                                 logger.debug(f'REF FOR WER: {ref}')
+
+                                io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
+
                                 wer_obj.AddHypRef(hyp, ref)
 
                                 wer , ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
@@ -368,6 +395,8 @@ if __name__ == "__main__":
 
                                 #Remove hyp/ref from WER
                                 wer_obj.AddHypRef('', '')
+
+                                str_sum, str_details, str_keyphrases_info = wer_obj.GetSummaries()
 
                                 # Get words producing errors
                                 inserted_words, deleted_words, substituted_words = wer_obj.GetMissedWords()
@@ -380,9 +409,9 @@ if __name__ == "__main__":
                                 word_count_list = (delete_word_counts, inserted_word_counts,  substituted_word_count  )
                                 logger.debug(f'WORD COUNT LIST: {word_count_list}')
 
-                                io_handler.write_csv_header(configuration, nlp_model)
+                                io_handler.write_csv_header(configuration, nlp_model, key_words)
 
-                                io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list )
+                                io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list, key_words )
                                 io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
 
                                 #NLP options
