@@ -107,6 +107,7 @@ if __name__ == "__main__":
     key_words = list()
     if phrase_file_path:
         phrases = io_handler.read_file(phrase_file_path)
+        phrases.lower()
         key_words = phrases
     if phrases:
         if no_zeros_for_boost:
@@ -294,7 +295,8 @@ if __name__ == "__main__":
                         ref = gcs.read_ref(cloud_store_uri, root + '.txt')
                     else:
                         ref = io_handler.read_file(local_files_path + '/' + root + '.txt')
-
+                    ref.lower()
+                    logger.debug(f'ORIGINAL REF: {ref}')
                     #for speech_run in speech_context_runs:
                     for boost in boosts:
                         for language in language_codes:
@@ -338,21 +340,26 @@ if __name__ == "__main__":
                                 hyp = speech_to_text.transcribe_streaming(file, configuration)
                             else:
                                 hyp = speech_to_text.get_hypothesis(audio, configuration)
+                            hyp.lower()
 
-
+                            wer_obj = SimpleWER()
                             unique_root = utilities.create_unique_root(root, configuration, nlp_model)
                             if only_transcribe:
                                 io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
 
+                            logger.debug(f'ORIGINAL HYP: {hyp}')
+
                             if not only_transcribe:
                                 # Calculate WER
                                 if keywords_on:
-                                    wer_obj = SimpleWER(key_phrases= phrases)
-                            
+                                    wer_obj = SimpleWER(key_phrases= key_words )
+                                    ref = key_words
+
                                     if phrases not in hyp:
                                         hyp = ''
                                     else:
-                                        hyp = phrases
+                                        hyp = key_words
+
 
 
                                 if process_each_character:

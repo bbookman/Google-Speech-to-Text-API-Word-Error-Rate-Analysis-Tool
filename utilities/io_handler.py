@@ -200,13 +200,15 @@ class IOHandler(object):
             print(e)
         # If phrase file exists, read phrases
         try:
-            with open(file_path, 'r') as file:
+            with open(file_path, 'r', encoding='latin-1') as file:
                 contents = file.read()
-                result = contents.split()
+                r = contents.split(',')
+                r = ''.join(r)
+                result = r.replace('\n', '')
                 if not result:
                     raise EOFError(f"No data found in {file_path} ")
         except IOError as e:
             print(f'Could not open file {file_path}')
             raise
-        result = ''.join(result)
-        return result
+        return result.lower()
+
