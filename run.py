@@ -296,7 +296,7 @@ if __name__ == "__main__":
                     else:
                         ref = io_handler.read_file(local_files_path + '/' + root + '.txt')
                     ref.lower()
-                    logger.debug(f'ORIGINAL REF: {ref}')
+
                     #for speech_run in speech_context_runs:
                     for boost in boosts:
                         for language in language_codes:
@@ -340,13 +340,15 @@ if __name__ == "__main__":
                                 hyp = speech_to_text.transcribe_streaming(file, configuration)
                             else:
                                 hyp = speech_to_text.get_hypothesis(audio, configuration)
-                            hyp.lower()
+                            hyp = hyp.lower()
+                            ref = ref.lower()
 
                             wer_obj = SimpleWER()
                             unique_root = utilities.create_unique_root(root, configuration, nlp_model)
                             if only_transcribe:
                                 io_handler.write_hyp(file_name=unique_root + '.txt', text=hyp)
 
+                            logger.debug(f'ORIGINAL REF: {ref}')
                             logger.debug(f'ORIGINAL HYP: {hyp}')
 
                             if not only_transcribe:
@@ -355,12 +357,10 @@ if __name__ == "__main__":
                                     wer_obj = SimpleWER(key_phrases= key_words )
                                     ref = key_words
 
-                                    if phrases not in hyp:
+                                    if key_words.lower() not in hyp:
                                         hyp = ''
                                     else:
-                                        hyp = key_words
-
-
+                                        hyp = key_words.lower()
 
                                 if process_each_character:
                                     hyp = list(hyp)
