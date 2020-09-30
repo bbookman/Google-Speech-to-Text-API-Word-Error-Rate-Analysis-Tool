@@ -248,7 +248,7 @@ if __name__ == "__main__":
                     f'sample rate: {sample_rate_hertz}\n'
                     f'audio channels: {audio_channel_count}\n'
                     f'speech context: {bool(phrases)}, boosts: {boosts}\n'
-                    f'process each char: {process_each_letter}\n'
+                    f'process each char: {process_each_character}\n'
                     f'expand numbers to words: {nlp_model.get_n2w()}\n'
                     f'remove stop words: {nlp_model.get_remove_stop_words()}\n'
                     f'expand contractions: {nlp_model.expand_contractions}\n'
@@ -362,8 +362,6 @@ if __name__ == "__main__":
                                 # Calculate WER
                                 wer_obj = SimpleWER()
 
-                                if process_each_letter:
-                                    logger.debug('PROCESSING EACH CHARACTER')
 
                                 if keywords_on:
                                     wer_obj = SimpleWER(key_phrases= key_words )
@@ -375,6 +373,7 @@ if __name__ == "__main__":
                                         hyp = key_words.lower()
 
                                 if process_each_character:
+                                    logger.debug('PROCESSING EACH CHAR')
 
                                     hyp = list(hyp)
                                     hyp = ' '.join(hyp)

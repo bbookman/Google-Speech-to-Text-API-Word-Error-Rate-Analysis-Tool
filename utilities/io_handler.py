@@ -200,11 +200,9 @@ class IOHandler(object):
             print(e)
         # If phrase file exists, read phrases
         try:
-<<<<<<< HEAD
-            with open(file_path, 'r',  encoding='latin-1') as file:
-=======
+
             with open(file_path, 'r', encoding='latin-1') as file:
->>>>>>> keywords
+
                 contents = file.read()
                 r = contents.split(',')
                 r = ''.join(r)
@@ -214,10 +212,7 @@ class IOHandler(object):
         except IOError as e:
             print(f'Could not open file {file_path}')
             raise
-<<<<<<< HEAD
+
         result = ' '.join(result)
-        return result
-=======
         return result.lower()
 
->>>>>>> keywords
