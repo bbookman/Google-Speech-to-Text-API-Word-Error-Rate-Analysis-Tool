@@ -30,8 +30,7 @@ class IOHandler(object):
         if configuration.get_alternative_language_codes():
             csv_header+= 'ALTERNATIVE_LANGS,'
         csv_header+= 'HINTS,'
-        if configuration.get_boost():
-            csv_header+= 'BOOST,'
+        csv_header+= 'BOOST,'
 
         csv_header+= 'REF_WORD_COUNT, REF_ERROR_COUNT,'
         if nlp_model.get_apply_stemming():
@@ -104,7 +103,9 @@ class IOHandler(object):
             for item in (configuration.get_alternative_language_codes()):
                 alts += item + ' '
             string += f'{alts},'
-        string+= f'{bool(configuration.get_phrases())},'
+        string+= f'{bool(configuration.get_phrases())}, {configuration.get_boost()},'
+
+
         string+= f'{ref_total_word_count},{ref_error_count},'
         if nlp_model.get_apply_stemming():
             string+=  f'{nlp_model.get_apply_stemming()},'
