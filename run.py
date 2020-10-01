@@ -59,7 +59,7 @@ if __name__ == "__main__":
     parser.add_argument('-nzb', '--no_zeros_boost', required=False,  action='store_true', help='skip boost of 0' )
     parser.add_argument('-chxch', '--character_by_character', required=False, action='store_true', help='process each letter rather than whole words')
     parser.add_argument('-lf','--local_files_path', required=False, type=str, help='process local files',  default=None)
-    parser.add_argument('-k', '--key_words', required=False, action='store_true', help='use speech adaptation phrase file as keywords')
+    parser.add_argument('-k', '--keywords_on', required=False, action='store_true', help='use speech adaptation phrase file as keywords')
 
     nlp_model = NLPModel()
     io_handler = IOHandler()
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     process_each_character = args.character_by_character
     local_files_path = args.local_files_path
     limit = args.limit
-    keywords_on = args.key_words
+    keywords_on = args.keywords_on
     cloud_store_uri = args.cloud_store_uri
     io_handler.set_result_path(args.local_results_path)
     only_transcribe = args.transcriptions_only
@@ -108,14 +108,16 @@ if __name__ == "__main__":
     if phrase_file_path:
         phrases = io_handler.read_file(phrase_file_path)
         phrases.lower()
-        key_words = phrases
+
     if phrases:
+        key_words = phrases
         if no_zeros_for_boost:
             speech_context_runs = [True]
         else:
             speech_context_runs = [False, True]
         logger.debug(f'PHRASES: {phrases}')
     else:
+        key_words = None
         speech_context_runs = [False]
         logger.debug('NO SPEECH CONTEXT IN USE')
 
@@ -249,6 +251,7 @@ if __name__ == "__main__":
                     f'audio channels: {audio_channel_count}\n'
                     f'speech context: {bool(phrases)}, boosts: {boosts}\n'
                     f'process each char: {process_each_character}\n'
+                    f'keywords: {keywords_on}\n'
                     f'expand numbers to words: {nlp_model.get_n2w()}\n'
                     f'remove stop words: {nlp_model.get_remove_stop_words()}\n'
                     f'expand contractions: {nlp_model.expand_contractions}\n'
@@ -360,8 +363,6 @@ if __name__ == "__main__":
 
                             if not only_transcribe:
                                 # Calculate WER
-                                wer_obj = SimpleWER()
-
 
                                 if keywords_on:
                                     wer_obj = SimpleWER(key_phrases= key_words )
@@ -371,6 +372,8 @@ if __name__ == "__main__":
                                         hyp = ''
                                     else:
                                         hyp = key_words.lower()
+                                else:
+                                    wer_obj = SimpleWER()
 
                                 if process_each_character:
                                     logger.debug('PROCESSING EACH CHAR')
@@ -408,9 +411,9 @@ if __name__ == "__main__":
                                 word_count_list = (delete_word_counts, inserted_word_counts,  substituted_word_count  )
                                 logger.debug(f'WORD COUNT LIST: {word_count_list}')
 
-                                io_handler.write_csv_header(configuration, nlp_model, key_words)
+                                io_handler.write_csv_header(configuration, nlp_model)
 
-                                io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list, key_words )
+                                io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list)
                                 io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
 
                                 #NLP options

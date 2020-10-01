@@ -21,7 +21,7 @@ class IOHandler(object):
     def get_result_path(self):
         return self._result_path
 
-    def write_csv_header(self, configuration, nlp_model, str_keyphrases_info=None):
+    def write_csv_header(self, configuration, nlp_model):
         import os
 
         csv_header = 'WER, AUDIO_FILE, MODEL,'
@@ -43,8 +43,6 @@ class IOHandler(object):
             csv_header += 'NUMBER_TO_WORD_CONVERSION,'
         if nlp_model.get_expand_contractions():
             csv_header += 'CONTRACTIONS_EXPANDED,'
-        if str_keyphrases_info:
-            csv_header += 'KEY STATS,'
         csv_header+= 'INSERTIONS, DELETIONS, SUBSTITUTIONS, DELETED_WORDS, INSERTED_WORDS, SUBSTITUTE_WORDS\n'
 
 
@@ -112,9 +110,6 @@ class IOHandler(object):
         if not bool(configuration.get_phrases()):
             string += f'{configuration.get_boost()},'
         string+= f'{ref_total_word_count},{ref_error_count},'
-
-        if  str_keyphrases_info:
-            string += f'{str_keyphrases_info},'
         if nlp_model.get_apply_stemming():
             string+=  f'{nlp_model.get_apply_stemming()},'
         if nlp_model.get_remove_stop_words():
