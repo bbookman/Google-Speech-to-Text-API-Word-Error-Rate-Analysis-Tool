@@ -331,16 +331,11 @@ class SimpleWER(object):
     if self._html_handler:
       self.aligned_htmls += [aligned_html]
     # Update key phrase info.
-    if self.key_phrases and type(self.key_phrases) != str :
+    if self.key_phrases:
       for w in self.key_phrases:
         self.ref_keyphrase_counts[w] += reference.count(w)
         self.hyp_keyphrase_counts[w] += hypothesis.count(w)
         self.matched_keyphrase_counts[w] += matched_ref.count(w)
-    else:
-      w = ''.join(self.key_phrases)
-      self.ref_keyphrase_counts[w] += reference.count(w)
-      self.hyp_keyphrase_counts[w] += hypothesis.count(w)
-      self.matched_keyphrase_counts[w] += matched_ref.count(w)
 
   def GetWER(self):
     """Compute Word Error Rate (WER) to summarize word erroref_words.

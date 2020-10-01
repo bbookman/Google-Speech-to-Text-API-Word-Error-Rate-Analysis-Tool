@@ -29,8 +29,7 @@ class IOHandler(object):
         csv_header+= 'LANGUAGE,'
         if configuration.get_alternative_language_codes():
             csv_header+= 'ALTERNATIVE_LANGS,'
-        if configuration.get_phrases():
-            csv_header+= 'PHRASE_HINTS_APPLIED,'
+        csv_header+= 'HINTS,'
         if configuration.get_boost():
             csv_header+= 'BOOST,'
 
@@ -61,7 +60,7 @@ class IOHandler(object):
                     print(f'Can not find csv file: {x}')
             self._csv_header_written = True
 
-    def update_csv(self, word_error_rate, uri, configuration, nlp_model, word_count_list =None , str_keyphrases_info = None,ref_total_word_count = 0, ref_error_count = 0,  ins=0, deletions=0, subs=0 ):
+    def update_csv(self, word_error_rate, uri, configuration, nlp_model, word_count_list =None , ref_total_word_count = 0, ref_error_count = 0,  ins=0, deletions=0, subs=0 ):
         import logging
         logging.basicConfig(filename='wer_app.log')
         logger = logging.getLogger(__name__)
@@ -105,10 +104,7 @@ class IOHandler(object):
             for item in (configuration.get_alternative_language_codes()):
                 alts += item + ' '
             string += f'{alts},'
-        if bool(configuration.get_phrases()):
-            string += f'{bool(configuration.get_phrases())},'
-        if not bool(configuration.get_phrases()):
-            string += f'{configuration.get_boost()},'
+        string+= f'{bool(configuration.get_phrases())},'
         string+= f'{ref_total_word_count},{ref_error_count},'
         if nlp_model.get_apply_stemming():
             string+=  f'{nlp_model.get_apply_stemming()},'
