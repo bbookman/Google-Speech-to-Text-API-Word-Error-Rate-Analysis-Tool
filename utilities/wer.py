@@ -280,13 +280,13 @@ class SimpleWER(object):
           err_type = 'sub'  # substitute error
         elif distmat[pos_ref][pos_hyp] == distmat[pos_ref - 1][pos_hyp] + 1:
           err_type = 'del'  # deletion error
-          self.words_substituted.append(hyp_words[pos_hyp -1])
+
         elif distmat[pos_ref][pos_hyp] == distmat[pos_ref - 1][pos_hyp] + 1:
           err_type = 'del'  # deletion error
-          self.words_deleted.append(ref_words[pos_ref])
+
         elif distmat[pos_ref][pos_hyp] == distmat[pos_ref][pos_hyp - 1] + 1:
           err_type = 'ins'  # insersion error
-          #self.words_inserted.append(hyp_words[pos_hyp])
+
         else:
           raise ValueError('fail to parse edit distance matrix.')
 
@@ -314,10 +314,14 @@ class SimpleWER(object):
       # Adjust position of ref and hyp.
       if err_type == 'del':
         pos_ref = pos_ref - 1
+        self.words_deleted.append(ref_words[pos_ref])
       elif err_type == 'ins':
         pos_hyp = pos_hyp - 1
+        self.words_inserted.append(hyp_words[pos_hyp])
       else:  # err_type == 'sub'
         pos_hyp, pos_ref = pos_hyp - 1, pos_ref - 1
+        self.words_substituted.append(f'ref: {ref_words[pos_ref]} hyp: {hyp_words[pos_hyp]}')
+
 
     # Verify the computation of edit distance finishes
     assert distmat[-1][-1] == wer_info['ins'] + \
