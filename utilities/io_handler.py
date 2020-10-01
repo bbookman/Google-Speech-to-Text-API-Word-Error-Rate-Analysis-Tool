@@ -25,8 +25,7 @@ class IOHandler(object):
         import os
 
         csv_header = 'WER, AUDIO_FILE, MODEL,'
-        if configuration.get_use_enhanced():
-            csv_header+= 'ENHANCED,'
+        csv_header+= 'ENHANCED,'
         csv_header+= 'LANGUAGE,'
         if configuration.get_alternative_language_codes():
             csv_header+= 'ALTERNATIVE_LANGS,'
@@ -35,9 +34,9 @@ class IOHandler(object):
         if configuration.get_boost():
             csv_header+= 'BOOST,'
 
-        csv_header+= 'REF_WORD_COUNT, REF_ERROR_COUNT ,'
+        csv_header+= 'REF_WORD_COUNT, REF_ERROR_COUNT,'
         if nlp_model.get_apply_stemming():
-            csv_header+= 'STEMMING_APPLIED ,'
+            csv_header+= 'STEMMING_APPLIED,'
         if nlp_model.get_remove_stop_words():
             csv_header += 'STOP_WORDS_REMOVED,'
         if nlp_model.get_n2w():
@@ -45,7 +44,7 @@ class IOHandler(object):
         if nlp_model.get_expand_contractions():
             csv_header += 'CONTRACTIONS_EXPANDED,'
         if str_keyphrases_info:
-            csv_header += 'KEY STATS'
+            csv_header += 'KEY STATS,'
         csv_header+= 'INSERTIONS, DELETIONS, SUBSTITUTIONS, DELETED_WORDS, INSERTED_WORDS, SUBSTITUTE_WORDS\n'
 
 
@@ -99,10 +98,8 @@ class IOHandler(object):
                 substitute_words+=  f'{k}:{v}, '
         full_path = f'{self.get_result_path()}/{self._result_file_name}'
 
-        string = f'{word_error_rate},{uri}, {configuration.get_model()}, '
-        if configuration.get_use_enhanced():
-            string += 'ENHANCED,'
-
+        string = f'{word_error_rate},{uri},{configuration.get_model()}, '
+        string += f'{configuration.get_use_enhanced()},'
         string+= f'{configuration.get_language_code()},'
 
         if configuration.get_alternative_language_codes():
@@ -112,9 +109,12 @@ class IOHandler(object):
             string += f'{alts},'
         if bool(configuration.get_phrases()):
             string += f'{bool(configuration.get_phrases())},'
-        if configuration.get_boost() is not None:
+        if not bool(configuration.get_phrases()):
             string += f'{configuration.get_boost()},'
-        string+= f'{ref_total_word_count}, {ref_error_count},'
+        string+= f'{ref_total_word_count},{ref_error_count},'
+
+        if  str_keyphrases_info:
+            string += f'{str_keyphrases_info},'
         if nlp_model.get_apply_stemming():
             string+=  f'{nlp_model.get_apply_stemming()},'
         if nlp_model.get_remove_stop_words():
@@ -123,8 +123,7 @@ class IOHandler(object):
             string += f'{nlp_model.get_n2w()},'
         if nlp_model.get_expand_contractions():
             string+=f'{nlp_model.get_expand_contractions()},'
-        if str_keyphrases_info:
-            string+= f'{str_keyphrases_info}'
+
         string+= f'{ins}, {deletions}, {subs}, ' \
                  f'{deleted_words}, {inserted_words}, {substitute_words}\n'
         with open(full_path, 'a+',) as file:
