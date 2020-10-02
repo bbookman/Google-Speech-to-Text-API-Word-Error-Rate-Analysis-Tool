@@ -216,16 +216,14 @@ if __name__ == "__main__":
 
     # if queue file exists, give user option to continue last run
     io_handler.set_queue_file_name( utilities.create_unique_queue_file_name())
-    queue_file_name = io_handler.get_queue_file_name()
-    if os.path.isfile(queue_file_name):
+    if os.path.isfile(io_handler.get_queue_file_name()):
         delete_queue = input(
             'Queue file found, continue aborted run (Y/N).  Choosing N will delete existing queue file: ')
         if delete_queue:
-            os.remove(queue_file_name)
+            os.remove(io_handler.get_queue_file_name())
             print('DELETED: Existing queue.txt')
     else:
-        queue_file_name = utilities.create_unique_queue_file_name()
-        string = f'Queue file: {queue_file_name}'
+        string = f'Queue file: {io_handler.get_queue_file_name()}'
         logger.debug(string)
 
     io_handler.write_queue_file(audio_set)
@@ -252,7 +250,7 @@ if __name__ == "__main__":
         print()
 
     # Read queue
-    print(f'READ: {queue_file_name}')
+    print(f'READ: {io_handler.get_queue_file_name()}')
     queue_string = io_handler.read_queue_file()
     queue = queue_string.split(',')
     queue.remove('')
@@ -322,7 +320,8 @@ if __name__ == "__main__":
 
                             logger.debug(f'CONFIGURATION: {configuration}')
                             print(f'STARTING')
-                            msg = f'audio: {audio}, {configuration}'
+                            msg = f'audio: {audio}\n'
+                            msg+= f'configuration: {configuration}'
                             logger.debug(msg)
                             print(msg)
 
@@ -342,7 +341,7 @@ if __name__ == "__main__":
                             logger.debug(f'ORIGINAL HYP: {hyp}')
 
                             #delete audio fromm queue
-                            io_handler.remove_audio_from_queue(audio=audio, queue_file_name= queue_file_name)
+                            io_handler.remove_audio_from_queue(audio=audio, queue_file_name= io_handler.get_queue_file_name())
 
 
                             if write_hyp_ref_log :
@@ -446,8 +445,7 @@ if __name__ == "__main__":
                                     io_handler.update_csv(wer, audio, configuration, nlp_model,
                                                       ref_word_count, ref_error_count)
 
+    io_handler.delete_queue_file(io_handler.get_queue_file_name())
     print('Done')
-    print('Deleting queue')
-    os.remove(queue_file_name)
 
 

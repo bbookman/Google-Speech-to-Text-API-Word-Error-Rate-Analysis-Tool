@@ -231,3 +231,13 @@ class IOHandler(object):
             print(f'Could not open file {queue_file_name}')
             raise
 
+    def delete_queue_file(self, file):
+        import os
+        try:
+            os.remove(file)
+        except BaseException:
+            raise
+        print(f'DELETED QUEUE: {file}')
+
+
+
