@@ -101,13 +101,14 @@ class Configuration(object):
         self.useEnhanced = data
 
     def __str__(self):
-        string = f'model: {self.model}, ' \
-                f'language_code: {self.languageCode}, ' \
-                f'use_enhanced: {self.useEnhanced}, ' \
-                f'sample_rate: {self.sampleRateHertz}, ' \
-                f'encoding: {self.encoding}, ' \
-                f'channel count: {self.audioChannelCount}, ' \
-                f'phrases: {bool(self.get_phrases())}, boost:{self.get_boost()}, '
+        string = f'model: {self.model}\n' \
+                f'language_code: {self.languageCode}\n' \
+                f'use_enhanced: {self.useEnhanced}\n' \
+                f'sample_rate: {self.sampleRateHertz}\n' \
+                f'encoding: {self.encoding}\n' \
+                f'channel count: {self.audioChannelCount} \n' \
+                f'phrases: {bool(self.get_phrases())}\n' \
+                f'boost:{self.get_boost()}'
 
         audio_channel_count = self.get_audio_channel_count()
         if audio_channel_count > 1:

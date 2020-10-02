@@ -270,7 +270,7 @@ if __name__ == "__main__":
     queue.remove('')
     logger.debug(f'QUEUE: {queue}')
 
-
+    write_hyp_ref_log = True
 
     for model in models:
         logger.debug(f'CURRENT MODEL: {model}')
@@ -354,6 +354,12 @@ if __name__ == "__main__":
                             ref = ref.lower()
                             logger.debug(f'ORIGINAL REF: {ref}')
                             logger.debug(f'ORIGINAL HYP: {hyp}')
+
+                            if write_hyp_ref_log :
+                                io_handler.write_hyp_ref_log(hyp, ref, configuration, file)
+                                write_hyp_ref_log = False
+                            else:
+                                io_handler.write_hyp_ref_log(hyp, ref, None, file)
 
                             wer_obj = SimpleWER()
 

@@ -205,3 +205,21 @@ class IOHandler(object):
             raise
         return result.lower()
 
+    def write_hyp_ref_log(self, hyp, ref, configuration= None, audio_file=''):
+        try:
+            with open("hyp_ref.log", 'a+') as file:
+                if configuration:
+                    file.write('-------------------------\n')
+                    file.write(f'CONFIGURATION: \n')
+                    file.write(f'{configuration}\n')
+                    file.write('-------------------------\n')
+                file.write(f'AUDIO:     {audio_file}\n\n')
+                file.write(f'REFERENCE: {ref} \n\n')
+                file.write(f'API      : {hyp} \n\n')
+                file.write('-------------------------\n')
+
+        except IOError as e:
+            print(f'Could not open hyp ref log file')
+            raise
+
+
