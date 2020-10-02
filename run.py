@@ -406,9 +406,12 @@ if __name__ == "__main__":
                                 word_count_list = (delete_word_counts, inserted_word_counts,  substituted_word_count  )
                                 logger.debug(f'WORD COUNT LIST: {word_count_list}')
 
-                                io_handler.write_csv_header(configuration, nlp_model)
+                                io_handler.write_csv_header(configuration, nlp_model, include_j_f1 = keywords_on)
+                                jaccard_similarity, f1_k, matched_k, ref_k, hyp_k = wer_obj.GetKeyPhraseStats()
 
-                                io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list)
+
+                                io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list, str(jaccard_similarity),str(f1_k))
+
                                 io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
 
                                 #NLP options

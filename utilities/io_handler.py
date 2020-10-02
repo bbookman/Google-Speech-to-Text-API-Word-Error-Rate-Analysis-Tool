@@ -21,7 +21,7 @@ class IOHandler(object):
     def get_result_path(self):
         return self._result_path
 
-    def write_csv_header(self, configuration, nlp_model):
+    def write_csv_header(self, configuration, nlp_model, include_j_f1 = False):
         import os
 
         csv_header = 'WER, AUDIO_FILE, MODEL,'
@@ -31,7 +31,8 @@ class IOHandler(object):
             csv_header+= 'ALTERNATIVE_LANGS,'
         csv_header+= 'HINTS,'
         csv_header+= 'BOOST,'
-
+        if include_j_f1 :
+            csv_header+= 'JACCARD, F1'
         csv_header+= 'REF_WORD_COUNT, REF_ERROR_COUNT,'
         if nlp_model.get_apply_stemming():
             csv_header+= 'STEMMING_APPLIED,'
@@ -59,7 +60,7 @@ class IOHandler(object):
                     print(f'Can not find csv file: {x}')
             self._csv_header_written = True
 
-    def update_csv(self, word_error_rate, uri, configuration, nlp_model, word_count_list =None , ref_total_word_count = 0, ref_error_count = 0,  ins=0, deletions=0, subs=0 ):
+    def update_csv(self, word_error_rate, uri, configuration, nlp_model, word_count_list , jaccard_similarity= '', f1= '', ref_total_word_count = 0, ref_error_count = 0,  ins=0, deletions=0, subs=0 ):
         import logging
         logging.basicConfig(filename='wer_app.log')
         logger = logging.getLogger(__name__)
@@ -104,7 +105,10 @@ class IOHandler(object):
                 alts += item + ' '
             string += f'{alts},'
         string+= f'{bool(configuration.get_phrases())}, {configuration.get_boost()},'
-
+        if jaccard_similarity:
+            string+=f'{jaccard_similarity},'
+        if f1:
+            string+=f'{f1}'
 
         string+= f'{ref_total_word_count},{ref_error_count},'
         if nlp_model.get_apply_stemming():
