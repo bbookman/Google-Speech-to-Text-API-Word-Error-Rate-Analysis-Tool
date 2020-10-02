@@ -7,7 +7,7 @@ class IOHandler(object):
     _csv_header_written = False
     configuration = Configuration()
     nlp_model = NLPModel()
-    _queue_file_name = 'queue.txt'
+    _queue_file_name = ''
 
     def set_queue_file_name(self, name):
         self._queue_file_name = name
@@ -200,7 +200,7 @@ class IOHandler(object):
                 result = r.replace('\n', '')
                 if not result:
                     raise EOFError(f"No data found in {file_path} ")
-        except IOError as e:
+        except IOError:
             print(f'Could not open file {file_path}')
             raise
         return result.lower()
@@ -222,4 +222,12 @@ class IOHandler(object):
             print(f'Could not open hyp ref log file')
             raise
 
+    def remove_audio_from_queue(self, audio='', queue_file_name=''):
+        try:
+            with open(queue_file_name, 'w+') as file:
+                contents = file.read()
+                contents.replace(f'{audio} ,', '')
+        except IOError:
+            print(f'Could not open file {queue_file_name}')
+            raise
 

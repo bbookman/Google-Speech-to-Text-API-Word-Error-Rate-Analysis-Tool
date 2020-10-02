@@ -53,7 +53,6 @@ if __name__ == "__main__":
                         help=('Space separated list of boost values to evaluate for speech adaptation'))
     parser.add_argument('-ch', '--multi', required=False, type=int,
                         help='Integer indicating the number of channels if more than one')
-    parser.add_argument('-q', '--random_queue', required=False, action='store_true', help='Replaces default queue.txt with randomly named queue file')
     parser.add_argument('-fake', '--fake_hyp',  required=False, action='store_true', help='Use a fake hypothesis for testing')
     parser.add_argument('-limit', '--limit', required=False, default=None,type= int,  help = 'Limit to X number of audio files')
     parser.add_argument('-nzb', '--no_zeros_boost', required=False,  action='store_true', help='skip boost of 0' )
@@ -93,8 +92,6 @@ if __name__ == "__main__":
         boosts.append(0)
     alternative_language_codes = args.alternative_languages
     encoding = args.encoding
-
-    random_queue = args.random_queue
     use_fake_hyp = args.fake_hyp
 
     # init utilities
@@ -218,29 +215,20 @@ if __name__ == "__main__":
         print()
 
     # if queue file exists, give user option to continue last run
+    io_handler.set_queue_file_name( utilities.create_unique_queue_file_name())
     queue_file_name = io_handler.get_queue_file_name()
-    if not random_queue:
-        delete_queue = False
-        if os.path.isfile(queue_file_name):
-            delete_queue = input(
-                'Queue file found, continue aborted run (Y/N).  Choosing N will delete existing queue file: ')
-            if delete_queue:
-                os.remove(queue_file_name)
-                print('DELETED: Existing queue.txt')
+    if os.path.isfile(queue_file_name):
+        delete_queue = input(
+            'Queue file found, continue aborted run (Y/N).  Choosing N will delete existing queue file: ')
+        if delete_queue:
+            os.remove(queue_file_name)
+            print('DELETED: Existing queue.txt')
     else:
         queue_file_name = utilities.create_unique_queue_file_name()
-        io_handler.set_queue_file_name(queue_file_name)
-        string = f'Random queue file option selected. Queue file: {queue_file_name}'
-        print(string)
+        string = f'Queue file: {queue_file_name}'
         logger.debug(string)
-        cont = input("Continue Y/N? ")
-        if cont.lower() != "y":
-            sys.exit()
-
-
 
     io_handler.write_queue_file(audio_set)
-    print(f'WRITE: {queue_file_name}\n')
 
     confirm = input(f'models: {models} \n'
                     f'enhanced: {enhance}\n'
@@ -295,7 +283,7 @@ if __name__ == "__main__":
 
                     #read reference
                     if not only_transcribe:
-                        msg = f'READING: Reference file {cloud_store_uri}/{root}.txt'
+                        msg = f'READING: Reference file {root}.txt'
                         print(msg)
                         logger.debug(msg)
 
@@ -338,8 +326,6 @@ if __name__ == "__main__":
                             logger.debug(msg)
                             print(msg)
 
-
-
                             # Generate hyp
                             speech_to_text = SpeechToText()
 
@@ -354,6 +340,10 @@ if __name__ == "__main__":
                             ref = ref.lower()
                             logger.debug(f'ORIGINAL REF: {ref}')
                             logger.debug(f'ORIGINAL HYP: {hyp}')
+
+                            #delete audio fromm queue
+                            io_handler.remove_audio_from_queue(audio=audio, queue_file_name= queue_file_name)
+
 
                             if write_hyp_ref_log :
                                 io_handler.write_hyp_ref_log(hyp, ref, configuration, file)
