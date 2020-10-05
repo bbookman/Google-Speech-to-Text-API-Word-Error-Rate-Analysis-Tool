@@ -11,7 +11,11 @@ class Data(object):
             raise
         return df
 
-    def stats(self):
+    def stats(self, key_words_on):
         df = self.read_csv()
         df.drop(['INSERTIONS','DELETIONS','SUBSTITUTIONS','DELETED_WORDS','INSERTED_WORDS','SUBSTITUTE_WORDS'], axis=1, inplace=True)
-        df.groupby(['MODEL', 'ENHANCED', 'BOOST']).describe().to_html('describe.html')
+        if key_words_on:
+            df.groupby(['MODEL', 'ENHANCED', 'BOOST']).describe().to_html('describe.html')
+        else:
+            df.drop(['JACCARD', 'F1'], axis=1, inplace = True)
+            df.groupby(['MODEL', 'ENHANCED', 'BOOST']).describe().to_html('describe.html')

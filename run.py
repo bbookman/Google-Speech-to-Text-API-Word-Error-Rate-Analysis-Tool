@@ -452,7 +452,7 @@ if __name__ == "__main__":
     # summary
     data = Data(f'{io_handler.get_result_path()}/results.csv')
     data.read_csv()
-    data.stats()
+    data.stats(keywords_on)
 
 
 
