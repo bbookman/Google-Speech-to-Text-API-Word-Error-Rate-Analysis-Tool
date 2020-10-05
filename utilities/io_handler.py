@@ -24,7 +24,7 @@ class IOHandler(object):
     def write_csv_header(self, configuration, nlp_model, include_j_f1 = False):
         import os
 
-        csv_header = 'WER, AUDIO_FILE, MODEL,'
+        csv_header = 'WER,AUDIO_FILE,MODEL,'
         csv_header+= 'ENHANCED,'
         csv_header+= 'LANGUAGE,'
         if configuration.get_alternative_language_codes():
@@ -33,7 +33,7 @@ class IOHandler(object):
         csv_header+= 'BOOST,'
         if include_j_f1 :
             csv_header+= 'JACCARD, F1'
-        csv_header+= 'REF_WORD_COUNT, REF_ERROR_COUNT,'
+        csv_header+= 'REF_WORD_COUNT,REF_ERROR_COUNT,'
         if nlp_model.get_apply_stemming():
             csv_header+= 'STEMMING_APPLIED,'
         if nlp_model.get_remove_stop_words():
@@ -42,7 +42,7 @@ class IOHandler(object):
             csv_header += 'NUMBER_TO_WORD_CONVERSION,'
         if nlp_model.get_expand_contractions():
             csv_header += 'CONTRACTIONS_EXPANDED,'
-        csv_header+= 'INSERTIONS, DELETIONS, SUBSTITUTIONS, DELETED_WORDS, INSERTED_WORDS, SUBSTITUTE_WORDS\n'
+        csv_header+= 'INSERTIONS,DELETIONS,SUBSTITUTIONS,DELETED_WORDS,INSERTED_WORDS,SUBSTITUTE_WORDS\n'
 
 
         if not self._csv_header_written:

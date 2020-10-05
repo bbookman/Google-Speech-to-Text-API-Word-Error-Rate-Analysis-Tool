@@ -10,6 +10,7 @@ from model.nlp import NLPModel
 from utilities.nlp_options import NLPOptions
 from utilities.wer import SimpleWER
 import logging
+from utilities.data import  Data
 
 if __name__ == "__main__":
 
@@ -447,6 +448,13 @@ if __name__ == "__main__":
                                     # Update csv
                                     io_handler.update_csv(wer, audio, configuration, nlp_model,
                                                       ref_word_count, ref_error_count)
+
+    # summary
+    data = Data(f'{io_handler.get_result_path()}/results.csv')
+    data.read_csv()
+    data.stats()
+
+
 
     io_handler.delete_queue_file(io_handler.get_queue_file_name())
     print('Done')
