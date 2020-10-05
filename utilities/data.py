@@ -13,6 +13,5 @@ class Data(object):
 
     def stats(self):
         df = self.read_csv()
-        df.groupby(['MODEL','ENHANCED', 'BOOST' ])['WER'].mean()
-        import pdb;pdb.set_trace()
-        print('')
+        df.drop(['INSERTIONS','DELETIONS','SUBSTITUTIONS','DELETED_WORDS','INSERTED_WORDS','SUBSTITUTE_WORDS'], axis=1, inplace=True)
+        df.groupby(['MODEL', 'ENHANCED', 'BOOST']).describe().to_html('describe.html')

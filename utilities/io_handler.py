@@ -32,7 +32,7 @@ class IOHandler(object):
         csv_header+= 'HINTS,'
         csv_header+= 'BOOST,'
         if include_j_f1 :
-            csv_header+= 'JACCARD, F1'
+            csv_header+= 'JACCARD,F1,'
         csv_header+= 'REF_WORD_COUNT,REF_ERROR_COUNT,'
         if nlp_model.get_apply_stemming():
             csv_header+= 'STEMMING_APPLIED,'
