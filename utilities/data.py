@@ -11,11 +11,17 @@ class Data(object):
             raise
         return df
 
-    def stats(self, key_words_on):
+    def stats(self):
         df = self.read_csv()
-        df.drop(['INSERTIONS','DELETIONS','SUBSTITUTIONS','DELETED_WORDS','INSERTED_WORDS','SUBSTITUTE_WORDS'], axis=1, inplace=True)
-        if key_words_on:
-            df.groupby(['MODEL', 'ENHANCED', 'BOOST']).describe().to_html('describe.html')
-        else:
-            df.drop(['JACCARD', 'F1'], axis=1, inplace = True)
-            df.groupby(['MODEL', 'ENHANCED', 'BOOST']).describe().to_html('describe.html')
+        df.drop(['WER', 'AUDIO_FILE','INSERTIONS','DELETIONS','SUBSTITUTIONS','DELETED_WORDS','INSERTED_WORDS','SUBSTITUTE_WORDS'], axis=1, inplace=True)
+        df['WER_BY_GROUP'] = 0
+        grouped = df.groupby(['MODEL', 'ENHANCED', 'BOOST'])
+        averaged = grouped.apply(
+            lambda x: x.assign(WER_BY_GROUP = round((x.REF_ERROR_COUNT / x.REF_WORD_COUNT * 100), 3))).reset_index(['MODEL','ENHANCED', 'BOOST'], drop = True)
+        averaged.drop(columns=['LANGUAGE', 'HINTS', 'REF_WORD_COUNT', 'REF_ERROR_COUNT'], inplace=True)
+        averaged['WER_BY_GROUP'].idxmin
+        return averaged
+       # averaged.to_html('summary.html')
+
+
+

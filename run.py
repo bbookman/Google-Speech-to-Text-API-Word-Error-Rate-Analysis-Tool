@@ -257,7 +257,7 @@ if __name__ == "__main__":
     queue.remove('')
     logger.debug(f'QUEUE: {queue}')
 
-    write_hyp_ref_log = True
+    write_configuration = True
 
     for model in models:
         logger.debug(f'CURRENT MODEL: {model}')
@@ -344,12 +344,17 @@ if __name__ == "__main__":
                             #delete audio fromm queue
                             io_handler.remove_audio_from_queue(audio=audio, queue_file_name= io_handler.get_queue_file_name())
 
-
-                            if write_hyp_ref_log :
-                                io_handler.write_hyp_ref_log(hyp, ref, configuration, file)
-                                write_hyp_ref_log = False
+                            if write_configuration:
+                                if local_files_path:
+                                    io_handler.write_hyp_ref_log(hyp, ref, configuration, file)
+                                else:
+                                    io_handler.write_hyp_ref_log(hyp, ref, configuration, audio)
+                                write_configuration = False
                             else:
-                                io_handler.write_hyp_ref_log(hyp, ref, None, file)
+                                if local_files_path:
+                                    io_handler.write_hyp_ref_log(hyp, ref, None, file)
+                                else:
+                                    io_handler.write_hyp_ref_log(hyp,ref, None, audio_file=audio)
 
                             wer_obj = SimpleWER()
 
@@ -387,6 +392,7 @@ if __name__ == "__main__":
                                 wer_obj.AddHypRef(hyp, ref)
 
                                 wer , ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
+
                                 string = f'STATS: wer = {wer}%, ref words = {ref_word_count}, number of errors = {ref_error_count}'
                                 print(string)
                                 logger.debug(string)
@@ -408,10 +414,12 @@ if __name__ == "__main__":
                                 logger.debug(f'WORD COUNT LIST: {word_count_list}')
 
                                 io_handler.write_csv_header(configuration, nlp_model, include_j_f1 = keywords_on)
-                                jaccard_similarity, f1_k, matched_k, ref_k, hyp_k = wer_obj.GetKeyPhraseStats()
-
-
-                                io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list, str(jaccard_similarity),str(f1_k))
+                                if keywords_on:
+                                    jaccard_similarity, f1_k, matched_k, ref_k, hyp_k = wer_obj.GetKeyPhraseStats()
+                                    io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list,
+                                                          str(jaccard_similarity), str(f1_k))
+                                else:
+                                    io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list, ref_total_word_count = ref_word_count, ref_error_count = ref_error_count)
 
                                 io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
 
@@ -452,7 +460,7 @@ if __name__ == "__main__":
     # summary
     data = Data(f'{io_handler.get_result_path()}/results.csv')
     data.read_csv()
-    data.stats(keywords_on)
+    data.stats()
 
 
 
