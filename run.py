@@ -10,6 +10,7 @@ from model.nlp import NLPModel
 from utilities.nlp_options import NLPOptions
 from utilities.wer import SimpleWER
 import logging
+from utilities.data import  Data
 
 if __name__ == "__main__":
 
@@ -256,7 +257,7 @@ if __name__ == "__main__":
     queue.remove('')
     logger.debug(f'QUEUE: {queue}')
 
-    write_hyp_ref_log = True
+    write_configuration = True
 
     for model in models:
         logger.debug(f'CURRENT MODEL: {model}')
@@ -343,12 +344,17 @@ if __name__ == "__main__":
                             #delete audio fromm queue
                             io_handler.remove_audio_from_queue(audio=audio, queue_file_name= io_handler.get_queue_file_name())
 
-
-                            if write_hyp_ref_log :
-                                io_handler.write_hyp_ref_log(hyp, ref, configuration, file)
-                                write_hyp_ref_log = False
+                            if write_configuration:
+                                if local_files_path:
+                                    io_handler.write_hyp_ref_log(hyp, ref, configuration, file)
+                                else:
+                                    io_handler.write_hyp_ref_log(hyp, ref, configuration, audio)
+                                write_configuration = False
                             else:
-                                io_handler.write_hyp_ref_log(hyp, ref, None, file)
+                                if local_files_path:
+                                    io_handler.write_hyp_ref_log(hyp, ref, None, file)
+                                else:
+                                    io_handler.write_hyp_ref_log(hyp,ref, None, audio_file=audio)
 
                             wer_obj = SimpleWER()
 
@@ -386,6 +392,7 @@ if __name__ == "__main__":
                                 wer_obj.AddHypRef(hyp, ref)
 
                                 wer , ref_word_count, ref_error_count, ins, deletions, subs = wer_obj.GetWER()
+
                                 string = f'STATS: wer = {wer}%, ref words = {ref_word_count}, number of errors = {ref_error_count}'
                                 print(string)
                                 logger.debug(string)
@@ -414,6 +421,7 @@ if __name__ == "__main__":
                                                           str(jaccard_similarity), str(f1_k))
                                 else:
                                     io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list,)
+                                    io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list, ref_total_word_count = ref_word_count, ref_error_count = ref_error_count)
 
                                 io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
 
@@ -450,6 +458,13 @@ if __name__ == "__main__":
                                     # Update csv
                                     io_handler.update_csv(wer, audio, configuration, nlp_model,
                                                       ref_word_count, ref_error_count)
+
+    # summary
+    data = Data(f'{io_handler.get_result_path()}/results.csv')
+    data.read_csv()
+    data.stats()
+
+
 
     io_handler.delete_queue_file(io_handler.get_queue_file_name())
     print('Done')
