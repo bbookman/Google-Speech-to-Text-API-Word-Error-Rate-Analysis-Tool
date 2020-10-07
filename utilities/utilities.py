@@ -223,3 +223,13 @@ class Utilities():
             if os.path.isfile(os.path.join(path, file)):
                 yield file
 
+    def extract_digits(self, text):
+        return [int(s) for s in text.split() if s.isdigit()]
+
+
+
+
+
+
+
+
