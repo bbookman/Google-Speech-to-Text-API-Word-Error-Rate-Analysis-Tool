@@ -62,7 +62,7 @@ class IOHandler(object):
                     print(f'Can not find csv file: {x}')
             self._csv_header_written = True
 
-    def update_csv(self, word_error_rate, uri, configuration, nlp_model, word_count_list , jaccard_similarity= '', f1= '', ref_total_word_count = 0, ref_error_count = 0,  ins=0, deletions=0, subs=0, ref=False ):
+    def update_csv(self, word_error_rate, uri, configuration, nlp_model, word_count_list , jaccard_similarity= '', f1= '', ref_total_word_count = 0, ref_error_count = 0,  ins=0, deletions=0, subs=0):
         import logging
         logging.basicConfig(filename='wer_app.log')
         logger = logging.getLogger(__name__)
@@ -106,8 +106,6 @@ class IOHandler(object):
                 alts += item + ' '
             string += f'{alts},'
         string+= f'{bool(configuration.get_phrases())}, {configuration.get_boost()},'
-        if ref:
-            string+= ref
 
         if jaccard_similarity:
             string+=f'{jaccard_similarity},'

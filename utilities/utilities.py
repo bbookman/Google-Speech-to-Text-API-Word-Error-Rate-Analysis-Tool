@@ -191,16 +191,11 @@ class Utilities():
         return result
 
     def strip_puc(self, text=''):
-
-        import logging
-        # logging setup
-        logging.basicConfig(filename='wer_app.log', level=logging.DEBUG)
-        logger = logging.getLogger(__name__)
-        logger.debug(f'STRIP IN: {text}')
         result = text.replace('¿',' ')
         result = result.replace('.', ' ')
         result = result.replace('?', ' ')
-        logger.debug(f'STRIP OUT: {result}')
+        result = result.replace('-', '')
+
         return result
 
     def local_files(self, path):
@@ -210,7 +205,15 @@ class Utilities():
                 yield file
 
     def extract_digits(self, text):
-        return [int(s) for s in text.split() if s.isdigit()]
+
+        import logging
+        # logging setup
+        logging.basicConfig(filename='wer_app.log', level=logging.DEBUG)
+        logger = logging.getLogger(__name__)
+
+        result = [s for s in text.split() if s.isdigit()]
+        logger.debug(f'EXTRACTED DIGIT STRINGS: {result}' )
+        return result
 
 
 
