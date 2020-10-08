@@ -416,15 +416,14 @@ if __name__ == "__main__":
                                     word_count_list = (delete_word_counts, inserted_word_counts,  substituted_word_count  )
                                     logger.debug(f'WORD COUNT LIST: {word_count_list}')
 
-                                    io_handler.write_csv_header(configuration, nlp_model, include_j_f1 = keywords_on)
+                                    io_handler.write_csv_header(configuration, nlp_model, include_j_f1 = keywords_on, extract_digits = extract_digits)
 
-                                    if keywords_on:
+                                    if keywords_on or extract_digits:
                                         jaccard_similarity, f1_k, matched_k, ref_k, hyp_k = wer_obj.GetKeyPhraseStats()
                                         io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list,
-                                                              str(jaccard_similarity), str(f1_k))
+                                                              str(jaccard_similarity), str(f1_k),)
                                     else:
-                                        io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list,)
-                                        io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list, ref_total_word_count = ref_word_count, ref_error_count = ref_error_count)
+                                        io_handler.update_csv(wer, audio, configuration, nlp_model, word_count_list, ref_total_word_count = ref_word_count, ref_error_count = ref_error_count, ref=ref)
 
                                     io_handler.write_html_diagnostic(wer_obj, unique_root, io_handler.get_result_path())
 
@@ -470,6 +469,7 @@ if __name__ == "__main__":
     data = Data(f'{io_handler.get_result_path()}/results.csv')
     data.read_csv()
     data.stats()
+    print(data)
 
 
 

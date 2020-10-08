@@ -111,20 +111,6 @@ class Utilities():
 
 
     def parse_uri(self,uri):
-        # if uri = http://hello/world.txt
-        # data.scheme = http
-        # data.netloc = hello
-        # data.path = /world.txt
-        # folder = None ' '
-        # file = world.txt
-        #
-        # if uri = gs://foo/bar/baz/hello.wav
-        # data.scheme = gs
-        # data.netloc = foo
-        # data.path = /bar/baz/hello.wav'
-        # folder = bar/baz/
-        # file = hello.wav
-        # scheme, netloc, path, folder, file
 
         from urllib.parse import urlparse
         data = urlparse(uri)

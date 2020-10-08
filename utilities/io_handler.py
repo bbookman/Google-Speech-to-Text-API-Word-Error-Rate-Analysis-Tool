@@ -21,7 +21,7 @@ class IOHandler(object):
     def get_result_path(self):
         return self._result_path
 
-    def write_csv_header(self, configuration, nlp_model, include_j_f1 = False):
+    def write_csv_header(self, configuration, nlp_model, include_j_f1 = False, extract_digits = False):
         import os
 
         csv_header = 'WER,AUDIO_FILE,MODEL,'
@@ -31,6 +31,8 @@ class IOHandler(object):
             csv_header+= 'ALTERNATIVE_LANGS,'
         csv_header+= 'HINTS,'
         csv_header+= 'BOOST,'
+        if extract_digits:
+            csv_header+= 'DIGITS'
         if include_j_f1 :
             csv_header+= 'JACCARD,F1,'
         csv_header+= 'REF_WORD_COUNT,REF_ERROR_COUNT,'
@@ -60,7 +62,7 @@ class IOHandler(object):
                     print(f'Can not find csv file: {x}')
             self._csv_header_written = True
 
-    def update_csv(self, word_error_rate, uri, configuration, nlp_model, word_count_list , jaccard_similarity= '', f1= '', ref_total_word_count = 0, ref_error_count = 0,  ins=0, deletions=0, subs=0 ):
+    def update_csv(self, word_error_rate, uri, configuration, nlp_model, word_count_list , jaccard_similarity= '', f1= '', ref_total_word_count = 0, ref_error_count = 0,  ins=0, deletions=0, subs=0, ref=False ):
         import logging
         logging.basicConfig(filename='wer_app.log')
         logger = logging.getLogger(__name__)
@@ -77,10 +79,9 @@ class IOHandler(object):
             except TypeError as t:
                 string = f'{t}'
                 logger.debug(string)
-                print(string)
-                deleted_words_dict = None
-                inserted_words_dict = None
-                substitute_words_dict = None
+                deleted_words_dict = False
+                inserted_words_dict = False
+                substitute_words_dict = False
         deleted_words = ''
         inserted_words = ''
         substitute_words = ''
@@ -105,6 +106,9 @@ class IOHandler(object):
                 alts += item + ' '
             string += f'{alts},'
         string+= f'{bool(configuration.get_phrases())}, {configuration.get_boost()},'
+        if ref:
+            string+= ref
+
         if jaccard_similarity:
             string+=f'{jaccard_similarity},'
         if f1:
