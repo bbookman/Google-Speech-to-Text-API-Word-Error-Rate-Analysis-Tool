@@ -213,6 +213,7 @@ class Utilities():
 
         result = [s for s in text.split() if s.isdigit()]
         logger.debug(f'EXTRACTED DIGIT STRINGS: {result}' )
+
         return result
 
 
