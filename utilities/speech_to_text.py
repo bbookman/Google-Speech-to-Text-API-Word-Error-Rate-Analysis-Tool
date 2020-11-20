@@ -33,7 +33,7 @@ class SpeechToText(object):
         audio = {"uri": uri}
         operation = object
         try:
-            operation = client.long_running_recognize(config, audio)
+            operation = client.long_running_recognize(config = config, audio=audio)
         except google.api_core.exceptions.InvalidArgument as e:
             raise e
         count = 0
