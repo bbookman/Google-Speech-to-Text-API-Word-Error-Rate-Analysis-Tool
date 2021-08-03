@@ -39,7 +39,9 @@ class GCS(object):
         client = storage.Client()
         bucket, folder = self._parse_uri(uri)
         b = client.bucket(bucket)
-        path = f"{folder}/{txt_file}"
+        path = f"{txt_file}"
+        if len(folder) > 0:
+            path = f"{folder}/{txt_file}"
         blob = b.get_blob(path)
         result = blob.download_as_string().decode('latin-1')
         r = result.replace('\n', '')
