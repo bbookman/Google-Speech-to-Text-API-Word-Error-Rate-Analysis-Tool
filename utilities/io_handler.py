@@ -198,11 +198,10 @@ class IOHandler(object):
         try:
             with open(file_path, 'r',  encoding='latin-1') as file:
                 contents = file.read()
-                result = contents.split()
+                result = [x.strip() for x in contents.split(',')]
                 if not result:
                     raise EOFError(f"No data found in {file_path} ")
         except IOError as e:
             print(f'Could not open file {file_path}')
             raise
-        result = ' '.join(result)
         return result

@@ -114,7 +114,7 @@ Useful for some use cases where accurate transcription of every single word is n
 * -ex, --expand: Expand all contractions.  Example aren't = are not"
 * -stop, --remove_stop_words: Remove [stop words](https://www.geeksforgeeks.org/removing-stop-words-nltk-python/) from all text
 * -stem, --stem: Apply [stemming](https://www.datacamp.com/community/tutorials/stemming-lemmatization-python)
-* -n2w, --numbers_to_words: Convert numbers to words.  Example "order number 123" = "order number one two three"
+* -nw, --numbers_to_words: Convert numbers to words.  Example "order number 123" = "order number one two three"
 #### Other
 * -to, --transcriptions_only: If specified the only output will be transcripts, no analysis will be done
 * -a, --alts2prime: Use each alternative language as a primary language.  Helpful when audio might be mixed for example en-US en-GB en-AU
